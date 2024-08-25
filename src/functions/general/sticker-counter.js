@@ -6,8 +6,8 @@ require('dotenv').config();
 function countStickerStreak(message, client) {
     const channel = client.channels.cache.get(process.env.CHANNEL_ID);
 
-    console.log(channel.id)
-    if (!message.stickers.size || !channel) return;
+   
+    if (!message.stickers.size || !channel || message.channel.id !== process.env.CHANNEL_ID) return;
 
     const sticker = message.stickers.first();
     const stickerId = sticker.id;
@@ -21,19 +21,14 @@ function countStickerStreak(message, client) {
     } else {
         if (streakCount >= 5) {
             console.log(`Streak was broken`); 
-            channel.send(`**${lastStickerName}** streak  of ${streakCount } was broken`);    
+            const userMention = `<@${message.author.id}>`;
+            channel.send(`${userMention} broke the **${lastStickerName}** streak of ${streakCount}`);    
         }
         streakCount = 1; 
         lastStickerId = stickerId;
         lastStickerName = stickerName;
-
-
-
     }
-
     console.log(streakCount)
-
-
 }
 
 module.exports = { countStickerStreak };

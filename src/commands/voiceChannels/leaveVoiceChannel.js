@@ -3,7 +3,7 @@ const { getVoiceConnection, VoiceConnectionStatus } = require('@discordjs/voice'
 module.exports = {
   name: 'leave-vc',
   description: 'Leaves the voice channel where you are in',
-   deleted:true,
+   deleted:false,
 
   callback: async (client, interaction) => {
 
