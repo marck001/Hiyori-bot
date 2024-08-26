@@ -8,7 +8,7 @@ const discordTTS = require("discord-tts");
 module.exports = {
     name: 'text-to-speech',
     description: 'Plays an audio of the given words',
-    deleted: false,
+    deleted: true,
     devOnly: true,
     options: [
         {

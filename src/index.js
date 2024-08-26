@@ -1,8 +1,10 @@
 require('dotenv').config();
 const { Client, IntentsBitField, Message} = require('discord.js');
 const eventHandler = require('./handlers/eventHandler');
-const messageHandler = require('./events/messageCreate/handleMessages');
+//const messageHandler = require('./events/messageCreate/handleMessages');
 const {countStickerStreak }= require('./functions/general/sticker-counter')
+const {countEmoji }= require('./functions/general/emoji-counter')
+
 const client = new Client({
   intents: [
     IntentsBitField.Flags.Guilds,
@@ -25,14 +27,15 @@ const client = new Client({
 eventHandler(client);
 
 client.on('messageCreate', (message) => {
-  countStickerStreak(message, client)
-  messageHandler(client, message);
+  countStickerStreak(message, client);
+  countEmoji(message,client);
+  /*messageHandler(client, message);*/
 });
 
 
 
 client.on('ready', (c) => {
-  client.user.setActivity('hosting');
+  client.user.setActivity('Spam');
 
 });
 

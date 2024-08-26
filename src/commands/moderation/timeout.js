@@ -6,7 +6,7 @@ const ms = require('ms');
 /*const prettyMs = require('pretty-ms');*/
 
   module.exports = {
-    deleted: false,
+    deleted: true,
     name: 'timeout',
     description: 'Timeout people',
     devOnly: true,

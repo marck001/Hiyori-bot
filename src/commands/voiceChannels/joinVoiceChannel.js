@@ -3,7 +3,7 @@ const { joinVoiceChannel, VoiceConnectionStatus } = require('@discordjs/voice');
 module.exports = {
   name: 'join-vc',
   description: 'Joins the voice channel where you are in',
-  deleted:false,
+  deleted:true,
 
   callback: async (client, interaction) => {
 
