@@ -1,6 +1,6 @@
 const {
     ApplicationCommandOptionType,
-    PermissionFlagsBits,
+    PermissionFlagsBits,ChannelType,
   } = require('discord.js');
   
   module.exports = {
@@ -17,8 +17,8 @@ const {
       {
         name: 'channel',
         description :'Mention Channel',
-        required: true,
-        type: ApplicationCommandOptionType.String,
+        required: false,
+        type: ApplicationCommandOptionType.Channel,
 
       }
       
@@ -27,13 +27,17 @@ const {
     botPermissions: [PermissionFlagsBits.Administrator],
   
     callback: async (client, interaction) => {
-      //regex
-      const RegexID = interaction.options.getString('channel');
-      const regex = /<#(\d+)>/;
-      const match = RegexID.match(regex);
-      const ID = match[1]
-      const channel =  await client.channels.cache.get(ID);
+      const channelObj = interaction.options.getChannel('channel');
       const message = interaction.options.getString('text');
+      const channel = channelObj || interaction.channel;
+      
+      if (channel.type !== ChannelType.GuildText) {
+        interaction.reply({
+          content: `You cannot send a message to a category or non-text channel!`,
+          ephemeral: true,
+        });
+        return;
+      }
 
       if(!channel){
         interaction.reply({
