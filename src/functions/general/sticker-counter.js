@@ -1,15 +1,14 @@
 let lastStickerId = null;
 let streakCount = 0;
 let lastStickerName = '';
-const Counter = require('../../schema/Counter');
-
-
 require('dotenv').config();
 
-async function countStickerStreak(message, client) {
+function countStickerStreak(message, client) {
 
     try {
         const channel = client.channels.cache.get(process.env.CHANNEL_ID);
+
+
         if (!message.stickers.size || !channel || message.channel.id !== process.env.CHANNEL_ID) return;
 
         const sticker = message.stickers.first();
@@ -26,25 +25,6 @@ async function countStickerStreak(message, client) {
                 console.log(`Streak was broken`);
                 const userMention = `<@${message.author.id}>`;
                 channel.send(`${userMention} broke the **${lastStickerName}** streak of ${streakCount}!`);
-
-                const query = {
-                    guildId: message.guild.id,
-                  };
-        
-                  const counter = await Counter.findOne(query).sort("-streak").limit(1);
-
-                  if (!counter || streakCount > counter.streak) {
-                    const newCounter = new Counter({
-                        userId: message.author.id,
-                        guildId: message.guild.id,
-                        stickerName:lastStickerName,
-                        streak: streakCount,
-                        date: Date.now(), 
-                    });
-                    await newCounter.save();
-                    console.log(newCounter.toJSON())
-                    channel.send(`The new **${lastStickerName}** streak record is ${streakCount}!`);
-                  }
             }
             streakCount = 1;
             lastStickerId = stickerId;
