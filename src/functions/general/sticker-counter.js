@@ -53,7 +53,7 @@ async function countStickerStreak(message, client) {
                     });
           
                     console.log(newCounter.toJSON());
-                    channel.send(`\n*The new current streak record is* **${streakCount}**! <:hiyoriHeart:1280172714283237406>`);
+                    channel.send(`*The new current streak record is* **${streakCount}**! \n <:hiyoriHeart:1280172714283237406>`);
                   }
             }
             streakCount = 1;

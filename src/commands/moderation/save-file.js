@@ -1,6 +1,6 @@
 const {
     ApplicationCommandOptionType,
-    EmbedBuilder, 
+    EmbedBuilder,   PermissionFlagsBits
   } = require('discord.js');
   
   const Blob = require('../../models/Blob'); 
@@ -23,6 +23,8 @@ const {
       },
     ],
     deleted: false,
+    permissionsRequired: [PermissionFlagsBits.Administrator],
+    botPermissions: [PermissionFlagsBits.Administrator],
   
     callback: async (client, interaction) => {
    
@@ -33,9 +35,6 @@ const {
   
       const fileType = urlString.endsWith('.gif') ?'gif':'image';
 
-    
-
-      console.log(fileType);
       try {
   
         const isValidUrl = urlString.match(/\.(jpeg|jpg|png|webp|gif|apng)$/i);

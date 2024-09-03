@@ -31,9 +31,9 @@ const {
       const message = interaction.options.getString('text');
       const channel = channelObj || interaction.channel;
       
-      if (channel.type !== ChannelType.GuildText) {
+      if (channel.type === ChannelType.GuildCategory) {
         interaction.reply({
-          content: `You cannot send a message to a category or non-text channel!`,
+          content: `You cannot send a message to a category!`,
           ephemeral: true,
         });
         return;

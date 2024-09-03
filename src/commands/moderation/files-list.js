@@ -1,13 +1,13 @@
 const {
     ApplicationCommandOptionType,
-    EmbedBuilder, 
+    EmbedBuilder,   PermissionFlagsBits
   } = require('discord.js');
   
   const Blob = require('../../models/Blob'); 
 
   const  pagination = require('../../components/buttons/pajination')
   module.exports = {
-    name: 'saved-files',
+    name: 'check-saved-files',
     description: 'Displays a list of all stored files',
     options: [
       {
@@ -18,6 +18,8 @@ const {
       },
     ],
     deleted: false,
+    permissionsRequired: [PermissionFlagsBits.Administrator],
+    botPermissions: [PermissionFlagsBits.Administrator],
   
     callback: async (client, interaction) => {
      await interaction.deferReply();
@@ -38,7 +40,7 @@ const {
         blobs.forEach((blob, index) => {
         const embed = new EmbedBuilder()
           .setColor(Math.floor(Math.random() * 16777214) + 1)
-          .setTitle(`-------- List of files saved --------`)
+          .setTitle(`-------- List of saved files --------`)
           .setAuthor({ name: `Page ${index +1} `})
           .addFields(
             { name: 'File name:', 
@@ -46,9 +48,15 @@ const {
                 inline: true },
             {
                 name: 'Created at: ', 
-                value: blob.createdAt, 
+                value: blob.createdAt.toISOString().split('T')[0], 
                 inline: true 
-            }
+            },
+            {
+              name: 'Added by: ', 
+              value: `<@${blob.userId}>`, 
+              inline: false
+          }
+
           )
           .setImage(blob.url)
           .setTimestamp()
