@@ -1,8 +1,9 @@
-const Counter = require('../../schema/Counter');
+const Counter = require('../../models/Counter');
 let lastStickerId = null;
 let streakCount = 0;
 let lastStickerName = '';
 require('dotenv').config();
+const { getRandomUlr} = require('../../modules/blob/getRandomUrl');
 
 async function countStickerStreak(message, client) {
 
@@ -17,9 +18,18 @@ async function countStickerStreak(message, client) {
         const stickerName = sticker.name;
         if (stickerId === lastStickerId) {
             streakCount++;
-            if (streakCount % 5 === 0) {
-                console.log(`${stickerName} has a streak of: ${streakCount}`);
-                channel.send(`**${stickerName}** has a streak of ** ${streakCount}**!`)
+            switch (true) {
+                case (streakCount % 1000 === 0):
+                    channel.send(`Incredible! **${stickerName}** has reached a streak of **${streakCount}**! <:hiyoriHeart:1280172714283237406>`);
+                    channel.send('https://cdn.discordapp.com/emojis/1181355299618177035.gif')
+                    break;
+                case (streakCount % 100 === 0):
+                    channel.send(`Wow, **${stickerName}** has a streak of **${streakCount}**! <:hiyoriHeart:1280172714283237406>`);
+                    channel.send( await getRandomUlr() || 'No files stored :(')
+                    break;
+                case (streakCount % 5 === 0):
+                    channel.send(`**${stickerName}** has a streak of **${streakCount}**!`);
+                    break;
             }
         } else {
             if (streakCount >= 5) {
@@ -43,10 +53,8 @@ async function countStickerStreak(message, client) {
                     });
           
                     console.log(newCounter.toJSON());
-                    channel.send(`The new **${lastStickerName}** streak record is ${streakCount}!`);
+                    channel.send(`\n*The new current streak record is* **${streakCount}**! <:hiyoriHeart:1280172714283237406>`);
                   }
-
-
             }
             streakCount = 1;
             lastStickerId = stickerId;

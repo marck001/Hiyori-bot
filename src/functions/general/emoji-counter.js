@@ -17,7 +17,7 @@ function countEmoji(message, client) {
 
         if (!matches || matches.length <= 5) return;
 
-
+      
         const emojiCounts = {};
 
         matches.forEach(emoji => {
@@ -31,8 +31,8 @@ function countEmoji(message, client) {
 
         const userMention = `<@${message.author.id}>`;
         let = resultMessage = ''
+        let = resultEmoji = ''
         for (const [emoji, count] of Object.entries(emojiCounts)) {
-
             const emojiName = emoji.match(/:\w+:/)[0].slice(1, -1);
             resultMessage += `${userMention} has spammed ${emojiName} **${count}** times\n`;
         }

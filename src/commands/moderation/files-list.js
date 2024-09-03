@@ -3,12 +3,12 @@ const {
     EmbedBuilder, 
   } = require('discord.js');
   
-  const Counter = require('../../models/Counter'); 
-  const { chunkArray } = require('../../modules/streak/splitArray');
+  const Blob = require('../../models/Blob'); 
+
   const  pagination = require('../../components/buttons/pajination')
   module.exports = {
-    name: 'streak-stats-test',
-    description: 'Displays a list of all streaks',
+    name: 'saved-files',
+    description: 'Displays a list of all stored files',
     options: [
       {
         name: 'page',
@@ -24,35 +24,36 @@ const {
       const page = interaction.options.getNumber('page') || 1;
   
       try {
-        const counters = await Counter.findAll({
+        const blobs = await Blob.findAll({
           where: { guildId: interaction.guild.id },
-          order: [['streak', 'DESC']],
+          order: [['id', 'DESC']],
         });
   
-        if (counters.length === 0) {
-          return interaction.editReply('No streak records found.');
+        if (blobs.length === 0) {
+          return interaction.editReply('No files were found.');
         }
-  
-        const chunkedCounters = chunkArray(counters, 10);
-        
+     
         let embeds = [];
 
-        chunkedCounters.forEach((chunk, index) => {
+        blobs.forEach((blob, index) => {
         const embed = new EmbedBuilder()
           .setColor(Math.floor(Math.random() * 16777214) + 1)
-          .setTitle(`-------- List of <:hiyoriHeart:1280172714283237406> streaks --------`)
+          .setTitle(`-------- List of files saved --------`)
           .setAuthor({ name: `Page ${index +1} `})
+          .addFields(
+            { name: 'File name:', 
+                value: blob.name, 
+                inline: true },
+            {
+                name: 'Created at: ', 
+                value: blob.createdAt, 
+                inline: true 
+            }
+          )
+          .setImage(blob.url)
           .setTimestamp()
           .setFooter({ text: 'Streaks', iconURL: 'https://static.wikia.nocookie.net/projectsekai/images/f/f6/Hatsune_Miku_-_25-ji%2C_Nightcord_de._April_Fools_Chibi.png/revision/latest?cb=20230922025244' });
-  
-        chunk.forEach((counter, i) => { 
-          const globalIndex = index* 10 + i + 1;
-          embed.addFields({
-            name: `${globalIndex}. Streak record: ${counter.date}`,
-            value: ` ${counter.stickerName} Streak of **${counter.streak}** broken by <@${counter.userId}>`,
-            inline: false
-          });
-        });
+
         embeds.push(embed)
       
       })

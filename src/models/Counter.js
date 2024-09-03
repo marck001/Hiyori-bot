@@ -24,11 +24,21 @@ const Counter = sequelize.define('Counter', {
         defaultValue: 0,
     },
     date: {
-        type: DataTypes.DATE,
+        type: DataTypes.DATEONLY,
         allowNull: false,
     },
 }, {
+  
     timestamps: false,
 });
+
+(async () => {
+    try {
+        await Counter.sync({ alter: true }); 
+        console.log('Counter table syncronyzed successfully');
+    } catch (error) {
+        console.error('Error creating Blob table:', error);
+    }
+})();
 
 module.exports = Counter;
