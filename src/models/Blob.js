@@ -37,6 +37,11 @@ const Blob = sequelize.define('Blob', {
             isIn: [['image', 'gif']],
         }
     },
+    context: {
+        type: DataTypes.STRING(30),
+        allowNull: false,
+        defaultValue: 'hiyori',
+    },
 }, {
     tableName: 'Blobs',
     timestamps: true,

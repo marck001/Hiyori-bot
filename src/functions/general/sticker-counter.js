@@ -10,6 +10,7 @@ async function countStickerStreak(message, client) {
     try {
         const channel = client.channels.cache.get(process.env.CHANNEL_ID);
 
+        //const streakChannel = client.channels.cache.get(process.env.STREAK_ID);
 
         if (!message.stickers.size || !channel || message.channel.id !== process.env.CHANNEL_ID) return;
 

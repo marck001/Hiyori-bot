@@ -6,8 +6,7 @@ module.exports = async (interaction, pages, initPage=0, time = 60 * 1000) => {
 
 
     try {
-
-
+        
         if (!interaction || !pages || pages.length === 0) throw new Error('[PAGINATION] Invalid args')
 
       
@@ -50,8 +49,7 @@ module.exports = async (interaction, pages, initPage=0, time = 60 * 1000) => {
 
 
         collector.on('collect', async i => {
-            /*if (i.user.id !== interaction.user.id) return
-            await i.reply({ content: `${interaction.user.username} cannot use them!`, ephemeral: true });*/
+            if (i.user.id !== interaction.user.id) return await i.editReply({ content: `${interaction.user.username} cannot use them!`, ephemeral: true });
 
             await i.deferUpdate();
 

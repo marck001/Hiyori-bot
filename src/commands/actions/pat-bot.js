@@ -43,7 +43,7 @@ const path = require('path');
       
         const embed = new EmbedBuilder()
           .setColor(Math.floor(Math.random() * 16777214) + 1)
-          .setDescription(`Aww, thank you so much :3 \n **${interaction.user}** pats me `)
+          .setDescription(`Aww, thank you so much :3 \n\n **${interaction.user}** *pats me* `)
           .setImage(gifsArray[randIndex])
           .setTimestamp()
   

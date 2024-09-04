@@ -20,10 +20,13 @@ const {
     deleted: false,
   
     callback: async (client, interaction) => {
-     await interaction.deferReply();
+   
       const page = interaction.options.getNumber('page') || 1;
   
       try {
+
+        await interaction.deferReply();
+
         const counters = await Counter.findAll({
           where: { guildId: interaction.guild.id },
           order: [['streak', 'DESC']],
@@ -34,6 +37,11 @@ const {
         }
   
         const chunkedCounters = chunkArray(counters, 10);
+
+        if (page > chunkedCounters.length) {
+          return interaction.editReply({content:`Page (${page}) not found.`,
+            ephemeral:true});
+        }
         
         let embeds = [];
 
@@ -49,7 +57,7 @@ const {
           const globalIndex = index* 10 + i + 1;
           embed.addFields({
             name: `${globalIndex}. Streak record: ${counter.date}`,
-            value: ` ${counter.stickerName} Streak of **${counter.streak}** broken by <@${counter.userId}>`,
+            value: `${counter.stickerName} streak of **${counter.streak}** broken by <@${counter.userId}>\n`,
             inline: false
           });
         });
