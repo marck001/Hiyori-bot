@@ -5,6 +5,7 @@ const {
 const fs = require('fs');
 const path = require('path');
 
+
   module.exports = {
     deleted: false,
     name: 'pat-user',
@@ -18,6 +19,8 @@ const path = require('path');
       },
 
     ],
+    devOnly: true,
+
   
   
     callback: async (client, interaction) => {

@@ -21,20 +21,23 @@ function countEmoji(message, client) {
         const emojiCounts = {};
 
         matches.forEach(emoji => {
-            if (emojiCounts[emoji]) {
-                emojiCounts[emoji]++;
-            } else {
-                emojiCounts[emoji] = 1;
-            }
+            emojiCounts[emoji] = (emojiCounts[emoji] || 0) + 1;
         });
-
 
         const userMention = `<@${message.author.id}>`;
         let = resultMessage = ''
         let = resultEmoji = ''
         for (const [emoji, count] of Object.entries(emojiCounts)) {
-            const emojiName = emoji.match(/:\w+:/)[0].slice(1, -1);
-            resultMessage += `${userMention} has spammed ${emojiName} **${count}** times\n`;
+            const emojiId = emoji.match(/:\d+/)[0].slice(1); 
+      
+            if (message.guild.emojis.cache.get(emojiId)) {
+            
+                resultMessage += `${userMention} has spammed  ${emoji}  **${count}** times\n`;
+            } else {
+              
+                const emojiName = emoji.match(/:\w+:/)[0].slice(1, -1);
+                resultMessage += `${userMention} has spammed *${emojiName}* **${count}** times\n`;
+            }
         }
         channel.send(resultMessage);
 

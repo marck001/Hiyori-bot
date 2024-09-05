@@ -20,9 +20,10 @@ const {
     deleted: false,
     permissionsRequired: [PermissionFlagsBits.Administrator],
     botPermissions: [PermissionFlagsBits.Administrator],
+    devOnly: true,
   
     callback: async (client, interaction) => {
-     await interaction.deferReply();
+     
       const page = interaction.options.getNumber('page') || 1;
   
       try {
@@ -32,7 +33,7 @@ const {
         });
   
         if (blobs.length === 0) {
-          return interaction.editReply('No files were found.');
+          return interaction.reply('No files were found.');
         }
      
         let embeds = [];
@@ -74,7 +75,7 @@ const {
   
       } catch (error) {
         console.error('Error fetching streaks:', error);
-        interaction.editReply('An error occurred while fetching streaks.');
+        interaction.reply('An error occurred while fetching streaks.');
       }
     },
   };

@@ -18,6 +18,7 @@ const {
       },
     ],
     deleted: false,
+    devOnly: true,
   
     callback: async (client, interaction) => {
    
@@ -25,21 +26,19 @@ const {
   
       try {
 
-        await interaction.deferReply();
-
         const counters = await Counter.findAll({
           where: { guildId: interaction.guild.id },
           order: [['streak', 'DESC']],
         });
   
         if (counters.length === 0) {
-          return interaction.editReply('No streak records found.');
+          return interaction.reply('No streak records found.');
         }
   
         const chunkedCounters = chunkArray(counters, 10);
 
         if (page > chunkedCounters.length) {
-          return interaction.editReply({content:`Page (${page}) not found.`,
+          return interaction.reply({content:`Page (${page}) not found.`,
             ephemeral:true});
         }
         
@@ -73,7 +72,7 @@ const {
   
       } catch (error) {
         console.error('Error fetching streaks:', error);
-        interaction.editReply('An error occurred while fetching streaks.');
+        interaction.reply('An error occurred while fetching streaks.');
       }
     },
   };

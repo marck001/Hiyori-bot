@@ -9,6 +9,8 @@ module.exports = async (interaction, pages, initPage=0, time = 60 * 1000) => {
         
         if (!interaction || !pages || pages.length === 0) throw new Error('[PAGINATION] Invalid args')
 
+            await interaction.deferReply();
+
       
         if (pages.lenght === 1) {
             return await interaction.editReply({ embeds: pages, components: [], fetchReply: true })
@@ -35,7 +37,7 @@ module.exports = async (interaction, pages, initPage=0, time = 60 * 1000) => {
             .setDisabled(index === pages.length - 1);
 
         const buttons = new ActionRowBuilder()
-            .addComponents([previousBtn, pageCount,nextBtn]);
+            .addComponents(previousBtn, pageCount,nextBtn);
 
 
         const msg = await interaction.editReply({ embeds: [pages[index]], components: [buttons], fetchReply: true })
@@ -49,7 +51,7 @@ module.exports = async (interaction, pages, initPage=0, time = 60 * 1000) => {
 
 
         collector.on('collect', async i => {
-            if (i.user.id !== interaction.user.id) return await i.editReply({ content: `${interaction.user.username} cannot use them!`, ephemeral: true });
+            if (i.user.id !== interaction.user.id) return await i.reply({ content: `${interaction.user.username} cannot use them!`, ephemeral: true });
 
             await i.deferUpdate();
 

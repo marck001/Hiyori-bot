@@ -25,6 +25,7 @@ const {
     ],
     permissionsRequired: [PermissionFlagsBits.Administrator],
     botPermissions: [PermissionFlagsBits.Administrator],
+    devOnly: true,
   
     callback: async (client, interaction) => {
       const channelObj = interaction.options.getChannel('channel');

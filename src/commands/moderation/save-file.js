@@ -25,13 +25,15 @@ const {
     deleted: false,
     permissionsRequired: [PermissionFlagsBits.Administrator],
     botPermissions: [PermissionFlagsBits.Administrator],
+    devOnly: true,
+   
   
     callback: async (client, interaction) => {
    
       const urlString = interaction.options.getString('url') ;
       const fileName = interaction.options.getString('name') || 'Unnamed File';
   
-      await interaction.deferReply();
+      //await interaction.deferReply();
   
       const fileType = urlString.endsWith('.gif') ?'gif':'image';
 
@@ -39,15 +41,15 @@ const {
   
         const isValidUrl = urlString.match(/\.(jpeg|jpg|png|webp|gif|apng)$/i);
         if (!isValidUrl) {
-          return interaction.editReply({
-            content:'Invalid file URL. Please provide a valid image or GIF URL ending in .gif | .jpeg | .png',
+          return interaction.reply({
+            content:'Invalid file URL. Please provide a valid image or GIF URL ending in .gif | .jpeg | .png like: \n ```https://example.com/mikugif.gif```',
             ephemeral:true});
         }
 
         
         const existingFile = await Blob.findOne({ where: { url: urlString } });
       if (existingFile) {
-        return interaction.editReply({
+        return interaction.reply({
           content:'This file URL is already saved in the database.', 
           ephemeral:true});
       }
@@ -62,16 +64,16 @@ const {
           });
 
           console.log(newFile.toJSON());
-          interaction.editReply({
-            content: 'The file has been added to the database!',
-            ephemeral: true,
+          interaction.reply({
+            content: `**The file has been added to the database!** \n ${urlString}`,
+            ephemeral: false,
           });
 
   
   
       } catch (error) {
         console.error('Error saving file:', error);
-        interaction.editReply({content:'An error occurred while saving files.',   ephemeral: true});
+        interaction.reply({content:'An error occurred while saving files.',   ephemeral: true});
       }
     },
   };

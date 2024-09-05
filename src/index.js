@@ -37,7 +37,7 @@ const initializeDatabase = require('./db/dbInit');
       });
 
       client.on('ready', (c) => {
-        client.user.setActivity('Spam');
+        client.user.setActivity('Testing in production');
 
       });
 

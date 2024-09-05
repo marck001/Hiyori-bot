@@ -3,6 +3,7 @@ const { EmbedBuilder } = require('discord.js');
 module.exports = {
   name: 'ping',
   description: 'Replies with the bot ping',
+  devOnly: true,
 
   callback: async (client, interaction) => {
     await interaction.deferReply();

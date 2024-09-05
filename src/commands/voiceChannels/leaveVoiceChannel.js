@@ -4,6 +4,7 @@ module.exports = {
   name: 'leave-vc',
   description: 'Leaves the voice channel where you are in',
    deleted:true,
+   devOnly: true,
 
   callback: async (client, interaction) => {
 

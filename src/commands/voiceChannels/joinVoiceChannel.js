@@ -4,6 +4,7 @@ module.exports = {
   name: 'join-vc',
   description: 'Joins the voice channel where you are in',
   deleted:true,
+  devOnly: true,
 
   callback: async (client, interaction) => {
 

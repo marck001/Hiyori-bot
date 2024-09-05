@@ -3,6 +3,7 @@ const { EmbedBuilder } = require('discord.js');
 module.exports = {
     name: 'help',
     description: 'Displays all the available commands',
+    devOnly: true,
   
     callback: async (client, interaction) => {
       await interaction.deferReply();
