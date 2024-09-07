@@ -63,8 +63,7 @@ const {
           .setTimestamp()
           .setFooter({ text: 'Streaks', iconURL: 'https://static.wikia.nocookie.net/projectsekai/images/f/f6/Hatsune_Miku_-_25-ji%2C_Nightcord_de._April_Fools_Chibi.png/revision/latest?cb=20230922025244' });
 
-        embeds.push(embed)
-      
+        embeds.push(embed)      
       })
       
 
