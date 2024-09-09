@@ -5,6 +5,20 @@ let lastStickerName = '';
 require('dotenv').config();
 const { getRandomUlr} = require('../../modules/blob/getRandomUrl');
 
+let highestStreak = null;
+
+
+async function updateHighestStreak(guildId) {
+    if (!highestStreak) {
+        const counter = await Counter.findOne({
+            where: { guildId },
+            order: [['streak', 'DESC']],
+        });
+        highestStreak = counter ? counter.streak : 0;
+    }
+}
+
+
 async function countStickerStreak(message, client) {
 
     try {
@@ -38,13 +52,10 @@ async function countStickerStreak(message, client) {
                 const userMention = `<@${message.author.id}>`;
                 channel.send(`${userMention} broke the **${lastStickerName}** streak of ${streakCount}!`);
 
+                  await updateHighestStreak(message.guild.id);
 
-                const counter = await Counter.findOne({
-                    where: { guildId: message.guild.id },
-                    order: [['streak', 'DESC']],
-                  });
 
-                  if (!counter || streakCount > counter.streak) {
+                  if (streakCount > highestStreak) {
                     const newCounter = await Counter.create({
                       userId: message.author.id,
                       guildId: message.guild.id,
@@ -53,6 +64,7 @@ async function countStickerStreak(message, client) {
                       date: new Date(), 
                     });
           
+                    highestStreak = streakCount;
                     console.log(newCounter.toJSON());
                     channel.send(`*The new current streak record is* **${streakCount}**! \n <:hiyoriHeart:1280172714283237406>`);
                   }

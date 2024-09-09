@@ -21,6 +21,22 @@ const {
         required: false,
         type: ApplicationCommandOptionType.String,
       },
+      {
+        name: 'context',
+        description: 'a purpose',
+        required: false,
+        type: ApplicationCommandOptionType.String,
+        choices:[
+          {
+            name: 'break-streak',
+            value: 'break'
+        },
+        {
+          name: 'record-streak',
+          value: 'streak'
+      },
+        ]
+      },
     ],
     deleted: false,
     permissionsRequired: [PermissionFlagsBits.Administrator],
@@ -32,6 +48,7 @@ const {
    
       const urlString = interaction.options.getString('url') ;
       const fileName = interaction.options.getString('name') || 'Unnamed File';
+      const context = interaction.options.getString('context') || 'hiyori';
   
       //await interaction.deferReply();
   
@@ -61,6 +78,7 @@ const {
             url: urlString,
             name: fileName,
             type: fileType, 
+            context: context,
           });
 
           console.log(newFile.toJSON());
