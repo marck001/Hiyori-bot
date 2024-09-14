@@ -3,31 +3,37 @@ const { getVoiceConnection, VoiceConnectionStatus } = require('@discordjs/voice'
 module.exports = {
   name: 'leave-vc',
   description: 'Leaves the voice channel where you are in',
-   deleted:true,
-   devOnly: true,
+  deleted: false,
+  devOnly: true,
 
   callback: async (client, interaction) => {
 
     const myChannel = interaction.member.voice.channel;
-    const connection = getVoiceConnection(myChannel.guild.id);
 
-    if (connection) {
-      connection.destroy();
+    if (myChannel) {
+      const connection = getVoiceConnection(myChannel.guild.id);
 
-      interaction.reply({
-        content: `Successfully left the voice channel **${myChannel.name}**`,
-        ephemeral: true,
-      });
+      if (connection) {
+        connection.destroy();
 
-      connection.on(VoiceConnectionStatus.Disconnected, () => {
-        console.log('The connection has entered the disconnected state');
-      });
+        interaction.reply({
+          content: `Successfully left the voice channel **${myChannel.name}**`,
+          ephemeral: true,
+        });
 
-    } else {
-      interaction.reply({
+        connection.on(VoiceConnectionStatus.Disconnected, () => {
+          console.log('The connection has entered the disconnected state');
+        });
+
+      }
+    }
+    else {
+      return interaction.reply({
         content: 'You must be in a Voice Channel!',
         ephemeral: true,
       });
     }
+
+
   },
 };

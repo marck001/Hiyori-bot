@@ -15,7 +15,7 @@ const path = require('path');
         name: 'target',
         description: 'The user to pat',
         required: true,
-        type: ApplicationCommandOptionType.Mentionable,
+        type: ApplicationCommandOptionType.User,
       },
 
     ],
@@ -27,12 +27,19 @@ const path = require('path');
   
       const userId = interaction.options.get('target').value;
       const channel = interaction.channel;
-      const user = await interaction.guild.members.fetch(userId);
   
+      try {
+    
+        const user = await interaction.guild.members.fetch(userId).catch(err => {
+          console.log(`Error fetching user: ${err}`);
+          return null;
+      });
+
       if (!user) {
-        await interaction.reply({ content: "That user doesn't exist in this server :(", ephemeral: true });
-        return;
+        return await interaction.reply({ content: "That user doesn't exist in this server :(", ephemeral: true });
+      
       }
+     
 
       if (!interaction.guild) {
         return interaction.reply({
@@ -40,11 +47,10 @@ const path = require('path');
             ephemeral: true
         });
     }
-  
-  
-      try {
 
-        await interaction.deferReply();
+
+    await interaction.deferReply();
+       
 
         //this is temporary
         const gifsFilePath = path.join(__dirname, '../../../data/gifs.json');

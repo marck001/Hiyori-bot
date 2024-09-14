@@ -16,8 +16,8 @@ module.exports = (client, message) => {
         case "Hello":
             messageText = "https://tenor.com/view/cat-chat-cat-fall-hello-chat-cat-gif-24961178";
             break; 
-        case "<:Gort:1215026947269333104>":
-            messageText = "https://tenor.com/view/linux-delete-funni-funny-capybara-gif-13530809397687099660";
+        case "<a:ElivNod:1263653339795554314>":
+            messageText = "<a:ElivNod:1263653339795554314>";
             break;
 
         case "@everyone":

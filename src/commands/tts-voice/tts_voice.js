@@ -53,6 +53,8 @@ module.exports = {
                         },
                     });
 
+                    
+
                     const resource = createAudioResource(stream,
                         {
                             inputType: StreamType.Arbitrary,
