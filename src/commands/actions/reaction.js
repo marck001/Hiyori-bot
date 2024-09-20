@@ -61,6 +61,13 @@ module.exports = {
             ephemeral: true,
           });
         }
+
+        await message.react(emoji);
+
+        interaction.reply({
+          content: 'Reaction added successfully!',
+          ephemeral: true,
+        });0
       }else{
         return interaction.reply({
           content: 'You can only react with emojis',
@@ -68,12 +75,7 @@ module.exports = {
         });
       }
 
-      await message.react(emoji);
-
-      interaction.reply({
-        content: 'Reaction added successfully!',
-        ephemeral: true,
-      });
+    
 
 
     }catch(err){
