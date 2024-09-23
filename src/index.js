@@ -1,6 +1,7 @@
 require('dotenv').config();
 const initializeDatabase = require('./db/dbInit');
-
+const { DisTube }= require('distube');
+const { YtDlpPlugin } = require("@distube/yt-dlp");
   (async () => {
     try {
 
@@ -18,7 +19,9 @@ const initializeDatabase = require('./db/dbInit');
           IntentsBitField.Flags.GuildMessages,
           IntentsBitField.Flags.MessageContent,
           IntentsBitField.Flags.GuildVoiceStates,
-          IntentsBitField.Flags.GuildMessageReactions
+          IntentsBitField.Flags.GuildMessageReactions,
+          IntentsBitField.Flags.GuildIntegrations
+
         ],
       });
 
@@ -27,6 +30,19 @@ const initializeDatabase = require('./db/dbInit');
        * @param {Client} client
        * @param {Message} message
        */
+
+      client.distube = new DisTube(client, {
+
+        emitNewSongOnly: true,
+        emitAddSongWhenCreatingQueue: false,
+        emitAddListWhenCreatingQueue: false,
+        nsfw: true, 
+        plugins:[
+          new YtDlpPlugin(
+           // {update: false,}
+          ),
+        ]
+      });
 
       eventHandler(client);
 

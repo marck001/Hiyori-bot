@@ -11,16 +11,22 @@ module.exports = {
     const myChannel = interaction.member.voice.channel;
 
     if (myChannel) {
+      /*
       const connection = joinVoiceChannel({
         channelId: myChannel.id,
         guildId: myChannel.guild.id,
         adapterCreator: myChannel.guild.voiceAdapterCreator,
       });
+      */
 
+      client.distube.voices.join(myChannel);
+
+      /*
       connection.on(VoiceConnectionStatus.Ready, () => {
         console.log('The connection has entered the Ready state - ready to play audio!');
       });
 
+      */
       interaction.reply({
         content: `Successfully joined the voice channel **${myChannel.name}** - ready to play audio!`,
         ephemeral: true,
