@@ -8,7 +8,7 @@ function isVoiceChannel(interaction) {
 
         if (member === null) {
 
-            interaction.reply("You need to join voice channel");
+            interaction.reply("You must be in a voice channel");
             return false;
         } else {
             return true;

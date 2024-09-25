@@ -1,5 +1,5 @@
 const { getVoiceConnection, VoiceConnectionStatus } = require('@discordjs/voice');
-
+const { isVoiceChannel } =require("../../modules/voice-channels/isVoiceChannel")
 module.exports = {
   name: 'leave-vc',
   description: 'Leaves the voice channel where you are in',
@@ -11,26 +11,10 @@ module.exports = {
     try{
     const myChannel = interaction.member.voice.channel;
 
-    const queue = client.distube.getQueue(interaction);
+    if (!isVoiceChannel(interaction)) return;
 
-    if (!queue) {
-      interaction.reply("Queue is empty");
-      return;
-    }
 
-    //if (myChannel) {
-     // const connection = getVoiceConnection(myChannel.guild.id);
-
-    //  if (connection) {
-       // connection.destroy();
-
-       if (queue.playing) {
-        queue.stop(interaction);
-
-      } else {
-        console.log("Nothing is getting played")
-      }
-
+    client.distube.voices.leave(interaction);
 
         interaction.reply({
           content: `Successfully left the voice channel **${myChannel.name}**`,
@@ -41,15 +25,7 @@ module.exports = {
           console.log('The connection has entered the disconnected state');
         });
 
-     // }
-   /* }
-    else {
-      return interaction.reply({
-        content: 'You must be in a Voice Channel!',
-        ephemeral: true,
-      });
-    }
-      */
+    
 
   }catch(err){
     console.log(err)

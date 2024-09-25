@@ -1,42 +1,34 @@
-const { joinVoiceChannel, VoiceConnectionStatus } = require('@discordjs/voice');
-
+const { VoiceConnectionStatus } = require('@discordjs/voice');
+const { isVoiceChannel } =require("../../modules/voice-channels/isVoiceChannel")
 module.exports = {
   name: 'join-vc',
   description: 'Joins the voice channel where you are in',
-  deleted:false,
+  deleted: false,
   devOnly: true,
 
   callback: async (client, interaction) => {
 
-    const myChannel = interaction.member.voice.channel;
+    try {
+      const myChannel = interaction.member.voice.channel;
 
-    if (myChannel) {
-      /*
-      const connection = joinVoiceChannel({
-        channelId: myChannel.id,
-        guildId: myChannel.guild.id,
-        adapterCreator: myChannel.guild.voiceAdapterCreator,
-      });
-      */
 
-      client.distube.voices.join(myChannel);
+      if (isVoiceChannel(interaction)) {
 
-      /*
-      connection.on(VoiceConnectionStatus.Ready, () => {
-        console.log('The connection has entered the Ready state - ready to play audio!');
-      });
 
-      */
-      interaction.reply({
-        content: `Successfully joined the voice channel **${myChannel.name}** - ready to play audio!`,
-        ephemeral: true,
-      });
+        client.distube.voices.join(myChannel);
 
-    } else {
-      interaction.reply({
-        content: 'You must be in a Voice Channel!',
-        ephemeral: true,
-      });
+        interaction.reply({
+          content: `Successfully joined the voice channel **${myChannel.name}** - ready to play audio!`,
+          ephemeral: true,
+        });
+
+      } else {
+        interaction.reply("first you need be in a voice channel");
+      }
+    } catch (err) {
+      console.log("There was an error")
     }
+
+
   }
 };
