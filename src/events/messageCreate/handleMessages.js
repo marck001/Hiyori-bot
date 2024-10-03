@@ -1,4 +1,7 @@
 const { Client, Message } = require('discord.js');
+const fs = require('fs');
+const path = require('path');
+
 
 /**
  *
@@ -8,19 +11,23 @@ const { Client, Message } = require('discord.js');
 
 module.exports = (client, message) => {
 
+    const gifsFilePath = path.join(__dirname, '../../../data/gifs.json');
+    const gifsData = JSON.parse(fs.readFileSync(gifsFilePath, 'utf8'));
+ 
     if (!message.inGuild() || message.author.bot) return;
     let = messageText = " ";
-    switch (message.content) {
+    switch (message.content.toLowerCase()) {
 
-        case "Hi":
-        case "Hello":
-            messageText = "https://tenor.com/view/cat-chat-cat-fall-hello-chat-cat-gif-24961178";
+        case "hi":
+        case "hello":
+            messageText = gifsData.wave;
             break; 
-            /*
-        case "<a:ElivNod:1263653339795554314>":
-            messageText = "<a:ElivNod:1263653339795554314>";
+            
+        case "gn":
+        case "goodnight":
+            messageText = gifsData.sleep;
             break;
-            */
+            
 
         case "@everyone":
             messageText = "https://tenor.com/view/everyone-ping-everyone-discord-discord-moment-gif-19916334";
@@ -33,7 +40,8 @@ module.exports = (client, message) => {
 
     }
     if (messageText !== " ") {
-        message.reply(messageText);
+        let randIndex = Math.floor(Math.random() *  messageText.length);
+        message.reply(messageText[randIndex]);
 
     }
 

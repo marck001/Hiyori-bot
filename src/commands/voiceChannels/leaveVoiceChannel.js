@@ -21,9 +21,11 @@ module.exports = {
           ephemeral: true,
         });
 
+        /*
         connection.on(VoiceConnectionStatus.Disconnected, () => {
           console.log('The connection has entered the disconnected state');
         });
+        */
 
     
 
