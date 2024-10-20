@@ -19,7 +19,7 @@ const Blob = sequelize.define('Blob', {
         type: DataTypes.STRING,
         allowNull: false,
         isValidImageOrGifUrl(value) {
-            const validExtensions = ['.jpeg', '.jpg', '.png', '.webp', '.gif', '.apng'];
+            const validExtensions = ['.jpeg', '.jpg', '.png', '.webp', '.gif', '.apng', '.mp4'];
             const isValid = validExtensions.some(ext => value.endsWith(ext));
             if (!isValid) {
                 throw new Error('URL must point to a valid image or GIF.');

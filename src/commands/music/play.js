@@ -25,14 +25,6 @@ module.exports = {
 
       const voiceChannel = interaction.member.voice.channel;
 
-      /*
-      if (!voiceChannel) {
-        return interaction.reply({
-          content: 'You need to be in a voice channel to use this command!',
-          ephemeral: true,
-        });
-      }*/
-
       if (!isVoiceChannel(interaction)) return;
 
       console.log('first')
@@ -64,9 +56,5 @@ module.exports = {
       });
 
     }
-
-
-
-
   },
 };
