@@ -41,9 +41,10 @@ const { YtDlpPlugin } = require("@distube/yt-dlp");
           new YtDlpPlugin(
            // {update: false,}
           ),
-        ]
+        ],
+        savePreviousSongs: true,
       });
-
+     
       eventHandler(client);
 
       client.on('messageCreate', (message) => {

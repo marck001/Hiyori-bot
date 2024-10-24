@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../db/sequelize');
 
-const Playlist = sequelize.define('Playlist', {
+const Song = sequelize.define('Song', {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -15,23 +15,27 @@ const Playlist = sequelize.define('Playlist', {
         type: DataTypes.STRING(20),
         allowNull: false,
     },
-    name: {
+    playlist: {
         type: DataTypes.STRING(50),
+        allowNull: false,
+    },
+    url: {
+        type: DataTypes.STRING,
         allowNull: false,
     },
 
 }, {
-    tableName: 'Playlists',
+    tableName: 'Songs',
     timestamps: true,
 });
 
 (async () => {
     try {
-        await Playlist.sync({ alter: true }); 
-        console.log('PlayList table syncronyzed successfully');
+        await Song.sync({ alter: true }); 
+        console.log('Songs table syncronyzed successfully');
     } catch (error) {
-        console.error('Error creating Playlist table:', error);
+        console.error('Error creating Songs table:', error);
     }
 })();
 
-module.exports = Playlist;
+module.exports = Song;

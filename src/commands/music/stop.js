@@ -11,20 +11,22 @@ module.exports = {
         try {
 
             if (!isVoiceChannel(interaction)) return;
+            const voiceChannel= interaction.member.voice.channel;
 
-            const queue = client.distube.getQueue(interaction);
+            const queue = client.distube.getQueue(voiceChannel);
 
             if (!queue) {
-                interaction.reply("Queue is empty");
+            await    interaction.reply("Queue is empty");
                 return;
             }
 
             if (queue.playing) {
-                queue.stop(interaction);
-                interaction.reply("I stopped playing music");
+            await    queue.stop(interaction);
+
+             await   interaction.reply("I stopped playing music");
 
             } else {
-                interaction.reply("Nothing is getting played")
+               await  interaction.reply("Nothing is getting played")
             }
 
         

@@ -5,20 +5,36 @@ const { Collection } = require('discord.js');
 
 module.exports = async (client, interaction) => {
 
+
+  if (interaction.isAutocomplete()) {
+    const localCommands = getLocalCommands();
+    const commandObject = localCommands.find(cmd => cmd.name === interaction.commandName);
+
+    if (!commandObject || typeof commandObject.autocomplete !== 'function') return;
+
+    try {
+      console.log(`Autocomplete for command: ${commandObject.name}`);
+      await commandObject.autocomplete(interaction);
+    } catch (error) {
+      console.error(`Error in autocomplete for command ${commandObject.name}:`, error);
+      await interaction.respond([]);
+    }
+    return;
+  }
+
   if (!interaction.isChatInputCommand()) return;
+
   const localCommands = getLocalCommands();
+  const commandObject = localCommands.find(cmd => cmd.name === interaction.commandName);
+
+  if (!commandObject) return;
+  console.log(`Command executed: ${commandObject.name}`);
 
   try {
-    const commandObject = localCommands.find(
-      (cmd) => cmd.name === interaction.commandName
-    );
-
-    if (!commandObject) return;
-    console.log(commandObject.name);
 
     if (!commandObject.name) {
-			return interaction.reply({content:`There is no command with name \`${commandObject.name}\`!`,ephemeral:true});
-		}
+      return interaction.reply({ content: `There is no command with name \`${commandObject.name}\`!`, ephemeral: true });
+    }
 
     if (!client.cooldowns) {
       client.cooldowns = new Collection();
@@ -87,6 +103,7 @@ module.exports = async (client, interaction) => {
     /* handleCooldown(client, interaction, client.cooldowns, commandObject);*/
 
     await commandObject.callback(client, interaction);
+
   } catch (error) {
     console.log(`There was an error running this command: ${error}`);
     interaction.reply({

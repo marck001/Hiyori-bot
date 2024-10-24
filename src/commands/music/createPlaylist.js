@@ -33,7 +33,7 @@ module.exports = {
             await playlist.save();
 
             await interaction.followUp({
-                content: `Playlist **${name}** has been created.`,
+                content: `Playlist **${name}** has been created. Add songs with /add-song command`,
                 ephemeral: true
             });
 

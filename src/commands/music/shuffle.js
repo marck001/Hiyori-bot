@@ -3,33 +3,23 @@ const {
     PermissionFlagsBits, ChannelType,
 } = require('discord.js');
 const { isVoiceChannel } = require('../../modules/voice-channels/isVoiceChannel')
+const PlayList = require('../../models/Playlist');
 module.exports = {
 
-    name: 'loop',
-    description: 'Repeats songs',
-    options: [
-        {
-            name: 'mode',
-            description: 'Repeat mode: 0 (Off), 1 (Song), 2 (Queue)',
-            required: false,
-            type: ApplicationCommandOptionType.Number
-        },
-    ],
+    name: 'shuffle',
+    description: 'Shuffle a playlist getting played',
     devOnly: true,
 
     callback: async (client, interaction) => {
 
-        
-
-        const num = interaction.options.get("mode").value;
-
-
         try {
 
             if (!isVoiceChannel(interaction)) return; 
-            const voiceChannel= interaction.member.voice.channel;
 
-            const queue = client.distube.getQueue(voiceChannel);
+            await interaction.deferReply();
+            const voiceChannel = interaction.member.voice.channel;
+
+            const queue = client.distube.getQueue(interaction);
 
             if (!queue) {
                 await interaction.followUp({
@@ -40,14 +30,13 @@ module.exports = {
             }
 
             if (queue.playing) {
-                mode = queue.setRepeatMode(num || 0);
-                mode = mode ? (mode === 2 ? "queue" : "song") : "Off";
+                await queue.shuffle();
                 await interaction.followUp({
-                    content: `Repeating ${mode}`,
+                    content: `🔀 The queue has been shuffled.`,
                     ephemeral: true,
                 });
             } else {
-              await  interaction.editReply("Nothing is getting played");
+                interaction.editReply("Nothing is getting played");
             }
 
 

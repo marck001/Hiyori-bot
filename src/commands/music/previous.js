@@ -1,13 +1,10 @@
-const {
-    ApplicationCommandOptionType,
-    ChannelType,
-} = require('discord.js');
+
 const { isVoiceChannel } = require('../../modules/voice-channels/isVoiceChannel')
 const PlayList = require('../../models/Playlist');
 module.exports = {
 
-    name: 'skip',
-    description: 'skips one song to the next',
+    name: 'previous',
+    description: 'goes back to previous song',
     devOnly: true,
     callback: async (client, interaction) => {
 
@@ -17,29 +14,26 @@ module.exports = {
 
             if (!isVoiceChannel(interaction)) return;
 
-            
-            await interaction.deferReply();
             console.log('first')
+            await interaction.deferReply();
+
+
+
             const queue = client.distube.getQueue(voiceChannel);
 
             if (!queue || !queue.songs.length) {
-              await  interaction.editReply("Queue is empty");
+            await    interaction.editReply("Queue is empty");
                 return;
             }
 
             if (queue.playing) {
 
-                if(queue.songs.length<=0){
-               await     interaction.editReply("There's no next song");
-                    return;
-                }
-       
-                await queue.skip();
+                await queue.previous();
 
-                console.log('skip')
+                console.log('previous')
 
                 await interaction.followUp({
-                    content: `**Skipped Song**`,
+                    content: `**Previous song**`,
                     ephemeral: true
                 });
             } else {

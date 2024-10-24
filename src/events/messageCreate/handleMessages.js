@@ -10,7 +10,7 @@ const path = require('path');
  */
 
 module.exports = (client, message) => {
-
+/*
     const gifsFilePath = path.join(__dirname, '../../../data/gifs.json');
     const gifsData = JSON.parse(fs.readFileSync(gifsFilePath, 'utf8'));
  
@@ -44,6 +44,7 @@ module.exports = (client, message) => {
         message.reply(messageText[randIndex]);
 
     }
+        */
 
 
 
