@@ -3,6 +3,7 @@ const {
   PermissionFlagsBits, ChannelType,
 } = require('discord.js');
 const { isVoiceChannel } = require('../../modules/voice-channels/isVoiceChannel')
+const { isValidYtUrl } = require('../../modules/blob/validYtUrl')
 module.exports = {
 
   name: 'play',
@@ -25,8 +26,12 @@ module.exports = {
 
       const voiceChannel = interaction.member.voice.channel;
 
-      if (!isVoiceChannel(interaction)) return;
+      
+      if (!isVoiceChannel(interaction) ) return;
 
+      if(!isValidYtUrl(url)){
+        return  interaction.reply({content:"You must provide a valid yt url",ephemeral:true});
+      }
       console.log('first')
       await interaction.deferReply();
 

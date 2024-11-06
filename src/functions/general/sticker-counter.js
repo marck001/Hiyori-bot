@@ -54,7 +54,6 @@ async function countStickerStreak(message, client) {
 
                   await updateHighestStreak(message.guild.id);
 
-
                   if (streakCount > highestStreak) {
                     const newCounter = await Counter.create({
                       userId: message.author.id,

@@ -1,13 +1,10 @@
 .env
 
-package-lock.json
-
-package.json
-
 node_modules
 
 config.json
 
-ffmpeg.exe
+deleteMessage.js
 
 data
+

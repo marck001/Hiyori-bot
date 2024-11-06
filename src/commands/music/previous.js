@@ -1,6 +1,5 @@
 
 const { isVoiceChannel } = require('../../modules/voice-channels/isVoiceChannel')
-const PlayList = require('../../models/Playlist');
 module.exports = {
 
     name: 'previous',
@@ -16,8 +15,6 @@ module.exports = {
 
             console.log('first')
             await interaction.deferReply();
-
-
 
             const queue = client.distube.getQueue(voiceChannel);
 

@@ -17,12 +17,36 @@ module.exports = {
       required: true,
       type: ApplicationCommandOptionType.String,
       autocomplete: true, 
+   /*    choices:[
+       {
+          name: 'evil-playlist',
+          value: 'evil-playlist'
+      },
+      {
+        name: 'neuro-playlist',
+        value: 'neuro-playlist'
     },
+    {
+      name: 'tutel',
+      value: 'tutel'
+  },
+      ]*/
+    },
+    {
+      name:'shuffle',
+      description:'Randomize the playlist order',
+      required:false,
+      type:ApplicationCommandOptionType.Boolean,
+
+
+    }
   ],
   devOnly: true,
+  autocomplete: true, 
 
   callback: async (client, interaction) => {
     const name = interaction.options.getString('playlist');
+    const isShuffled = interaction.options.getBoolean('shuffle')
 
     try {
 
@@ -33,7 +57,7 @@ module.exports = {
 
       await interaction.deferReply();
  
-      const playlist = await Playlist.findOne({ where: { guildId: guildId, name: name } })
+      const playlist = await Playlist.findOne({ where: { guildId,  name } })
       if (!playlist) {
         return interaction.editReply('Playlist not found.');
       }
@@ -46,9 +70,14 @@ module.exports = {
       console.log('Processing songs:', songs.map(song => song.url));
 
       const queue = client.distube.getQueue(voiceChannel);
+   
       if ( queue) {
-       await queue.stop(); 
+        queue.songs = [];
         console.log('Previous queue cleared.');
+      }
+
+      if(isShuffled){
+        songs.sort(() => Math.random() - 0.5);
       }
 
       const firstSong = songs[0];
@@ -60,13 +89,12 @@ module.exports = {
 
     
       await interaction.followUp({
-        content: `Playing ${name} playlist...`,
+        content: `Playing **${name}** playlist...`,
         ephemeral: true,
       });
 
-     
       for (let i = 1; i < songs.length; i++) {
-        await new Promise(resolve => setTimeout(resolve, 3000)); 
+        await new Promise(resolve => setTimeout(resolve, 2000)); 
         console.log(songs[i].url)
         await client.distube.play(voiceChannel, songs[i].url, {
           textChannel: interaction.channel,
@@ -75,47 +103,9 @@ module.exports = {
         });
       }
 
+   
       console.log('All songs from the playlist are now playing.');
 
-
-      /*
-      const playSongs = (songs, delay) => {
-        let index = 0;
-
-        const playNextSong = () => {
-          if (index < songs.length) {
-            const song = songs[index];
-            console.log(song.url)
-            client.distube.play(voiceChannel, song.url, {
-              textChannel: interaction.channel,
-              member: interaction.member,
-              interaction: interaction,
-            });
-
-            index++;
-          
-            setTimeout(playNextSong, delay);
-          }
-        };  
-        playNextSong();
-      };
-
-      const delay = 5000;  
-      playSongs(songs, delay);
-
-      
-    
-      console.log('Playing playlist')
-
-
-      await interaction.followUp({
-        content: `Playing ${name} playlist...`,
-        ephemeral: true
-      });
-
-      */
-
-    
     } catch (err) {
 
       console.log(err)
@@ -133,12 +123,21 @@ module.exports = {
 
     try {
        
-        const playlists = await Playlist.findAll({ where: { guildId: guildId } });
-        
+      
+
+        const playlists = await Playlist.findAll({ where: {  guildId } });
+        console.log('that shit is not working')
+        console.log('Focused value:', focusedValue);
+      console.log('Retrieved playlists:', playlists);
      
         const filteredPlaylists = playlists
             .filter(playlist => playlist.name && playlist.name.toLowerCase().startsWith(focusedValue.toLowerCase()));
 
+        
+      if (!filteredPlaylists.length) {
+        await interaction.respond([{ name: 'No playlists found', value: 'none' }]);
+        return;
+      }
       
         await interaction.respond(
             filteredPlaylists.map(playlist => ({
@@ -148,7 +147,7 @@ module.exports = {
         );
     } catch (err) {
         console.error('Error in autocomplete:', err);
-        await interaction.respond([]); 
+        await interaction.respond([{ name: 'Error loading playlists', value: 'error' }]);
     }
 },
 };

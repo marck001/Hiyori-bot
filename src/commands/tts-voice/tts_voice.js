@@ -52,8 +52,7 @@ module.exports = {
                             noSubscriber: NoSubscriberBehavior.Pause,
                         },
                     });
-
-                    
+            
 
                     const resource = createAudioResource(stream,
                         {

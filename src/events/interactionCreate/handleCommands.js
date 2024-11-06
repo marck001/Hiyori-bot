@@ -6,10 +6,13 @@ const { Collection } = require('discord.js');
 module.exports = async (client, interaction) => {
 
 
+  console.log('Interaction detected:', interaction.type);
   if (interaction.isAutocomplete()) {
+
     const localCommands = getLocalCommands();
     const commandObject = localCommands.find(cmd => cmd.name === interaction.commandName);
 
+    console.log('hello from working')
     if (!commandObject || typeof commandObject.autocomplete !== 'function') return;
 
     try {
@@ -25,6 +28,7 @@ module.exports = async (client, interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
   const localCommands = getLocalCommands();
+  console.log(localCommands);
   const commandObject = localCommands.find(cmd => cmd.name === interaction.commandName);
 
   if (!commandObject) return;

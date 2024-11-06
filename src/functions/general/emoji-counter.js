@@ -2,12 +2,9 @@ require('dotenv').config();
 
 
 function countEmoji(message, client) {
-
-
     try {
         const allowedChannelId = process.env.CHANNEL_ID;
         const channel = client.channels.cache.get(allowedChannelId);
-
 
         if (!channel || message.channel.id !== allowedChannelId || message.author.bot) return;
 

@@ -13,7 +13,7 @@ module.exports = {
             if (!isVoiceChannel(interaction)) return;
             const voiceChannel= interaction.member.voice.channel;
 
-            const queue = client.distube.getQueue(voiceChannel);
+            const queue = client.distube.getQueue(interaction);
 
             if (!queue) {
             await    interaction.reply("Queue is empty");

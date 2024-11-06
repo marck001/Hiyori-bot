@@ -1,9 +1,5 @@
-const {
-    ApplicationCommandOptionType,
-    ChannelType,
-} = require('discord.js');
+
 const { isVoiceChannel } = require('../../modules/voice-channels/isVoiceChannel')
-const PlayList = require('../../models/Playlist');
 module.exports = {
 
     name: 'skip',
@@ -13,14 +9,12 @@ module.exports = {
 
         try {
 
-            const voiceChannel = interaction.member.voice.channel;
-
             if (!isVoiceChannel(interaction)) return;
 
             
             await interaction.deferReply();
             console.log('first')
-            const queue = client.distube.getQueue(voiceChannel);
+            const queue = client.distube.getQueue(interaction);
 
             if (!queue || !queue.songs.length) {
               await  interaction.editReply("Queue is empty");

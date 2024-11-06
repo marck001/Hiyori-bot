@@ -19,17 +19,19 @@ module.exports = {
 
     callback: async (client, interaction) => {
 
-        
-
-        const num = interaction.options.get("mode").value;
+        const modeOption = interaction.options.get("mode");
+        const num = modeOption ? modeOption.value : 0;
 
 
         try {
 
             if (!isVoiceChannel(interaction)) return; 
-            const voiceChannel= interaction.member.voice.channel;
 
-            const queue = client.distube.getQueue(voiceChannel);
+            await interaction.deferReply();
+            
+            //const voiceChannel= interaction.member.voice.channel;
+
+            const queue = client.distube.getQueue(interaction);
 
             if (!queue) {
                 await interaction.followUp({
@@ -40,7 +42,7 @@ module.exports = {
             }
 
             if (queue.playing) {
-                mode = queue.setRepeatMode(num || 0);
+            let mode = queue.setRepeatMode(num);
                 mode = mode ? (mode === 2 ? "queue" : "song") : "Off";
                 await interaction.followUp({
                     content: `Repeating ${mode}`,

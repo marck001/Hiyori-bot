@@ -2,16 +2,16 @@ const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require(
 
 
 
-module.exports = async (interaction, pages, initPage=0, time = 60 * 1000) => {
+module.exports = async (interaction, pages, initPage = 0, time = 60 * 1000) => {
 
 
     try {
-        
+
         if (!interaction || !pages || pages.length === 0) throw new Error('[PAGINATION] Invalid args')
 
-            await interaction.deferReply();
+        await interaction.deferReply();
 
-      
+
         if (pages.lenght === 1) {
             return await interaction.editReply({ embeds: pages, components: [], fetchReply: true })
         }
@@ -37,7 +37,7 @@ module.exports = async (interaction, pages, initPage=0, time = 60 * 1000) => {
             .setDisabled(index === pages.length - 1);
 
         const buttons = new ActionRowBuilder()
-            .addComponents(previousBtn, pageCount,nextBtn);
+            .addComponents(previousBtn, pageCount, nextBtn);
 
 
         const msg = await interaction.editReply({ embeds: [pages[index]], components: [buttons], fetchReply: true })
@@ -57,25 +57,25 @@ module.exports = async (interaction, pages, initPage=0, time = 60 * 1000) => {
 
             switch (i.customId) {
                 case 'previous':
-                  if (index > 0) index--;
-                  break;
+                    if (index > 0) index--;
+                    break;
                 case 'next':
-                  if (index < pages.length - 1) index++;
-                  break;
-              }
-        
-              pageCount.setLabel(`${index + 1}/${pages.length}`);
-              previousBtn.setDisabled(index === 0);
-              nextBtn.setDisabled(index === pages.length - 1);
+                    if (index < pages.length - 1) index++;
+                    break;
+            }
 
-            await msg.edit({ embeds: [pages[index]], components: [buttons] }).catch(err => { console.error(err)})
+            pageCount.setLabel(`${index + 1}/${pages.length}`);
+            previousBtn.setDisabled(index === 0);
+            nextBtn.setDisabled(index === pages.length - 1);
+
+            await msg.edit({ embeds: [pages[index]], components: [buttons] }).catch(err => { console.error(err) })
 
             collector.resetTimer();
 
         });
 
         collector.on("end", async () => {
-            await msg.edit({ embeds: [pages[index]], components: [] }).catch(err => { console.error(err)})
+            await msg.edit({ embeds: [pages[index]], components: [] }).catch(err => { console.error(err) })
         })
 
         return msg;

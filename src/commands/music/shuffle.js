@@ -1,9 +1,6 @@
-const {
-    ApplicationCommandOptionType,
-    PermissionFlagsBits, ChannelType,
-} = require('discord.js');
+
 const { isVoiceChannel } = require('../../modules/voice-channels/isVoiceChannel')
-const PlayList = require('../../models/Playlist');
+
 module.exports = {
 
     name: 'shuffle',
@@ -17,7 +14,7 @@ module.exports = {
             if (!isVoiceChannel(interaction)) return; 
 
             await interaction.deferReply();
-            const voiceChannel = interaction.member.voice.channel;
+          //  const voiceChannel = interaction.member.voice.channel;
 
             const queue = client.distube.getQueue(interaction);
 

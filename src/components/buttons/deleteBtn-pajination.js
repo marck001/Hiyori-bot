@@ -1,16 +1,16 @@
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js')
 const Blob = require('../../models/Blob');
 
-module.exports = async (interaction, pages, components, initPage=0, time = 60 * 1000) => {
+module.exports = async (interaction, pages, components, initPage = 0, time = 60 * 1000) => {
 
 
     try {
-        
+
         if (!interaction || !pages || pages.length === 0) throw new Error('[PAGINATION] Invalid args')
 
-            await interaction.deferReply();
+        await interaction.deferReply();
 
-      
+
         if (pages.length === 1) {
             return await interaction.editReply({ embeds: pages, components: [], fetchReply: true })
         }
@@ -36,16 +36,9 @@ module.exports = async (interaction, pages, components, initPage=0, time = 60 * 
             .setDisabled(index === pages.length - 1);
 
         const buttons = new ActionRowBuilder()
-            .addComponents(previousBtn, pageCount,nextBtn);
+            .addComponents(previousBtn, pageCount, nextBtn);
 
-
-
-      
-        
-
-
-        const msg = await interaction.editReply({ embeds: [pages[index]], components: [buttons,components[index]], fetchReply: true })
-
+        const msg = await interaction.editReply({ embeds: [pages[index]], components: [buttons, components[index]], fetchReply: true })
 
 
         const collector = await msg.createMessageComponentCollector({
@@ -61,34 +54,34 @@ module.exports = async (interaction, pages, components, initPage=0, time = 60 * 
 
             switch (i.customId) {
                 case 'previous':
-                  if (index > 0) index--;
-                  break;
+                    if (index > 0) index--;
+                    break;
                 case 'next':
-                  if (index < pages.length - 1) index++;
-                  break;
+                    if (index < pages.length - 1) index++;
+                    break;
 
-              }
+            }
 
-              if(i.customId.startsWith('remove_')){
+            if (i.customId.startsWith('remove_')) {
                 const parts = i.customId.split('_');
-                const blobId = parts[1]; 
+                const blobId = parts[1];
                 const string = parts[2];
 
 
                 const cancelBtn = new ButtonBuilder()
-                .setCustomId(`remove_${blobId}_cancel`)
-                .setLabel('cancel')
-                .setStyle(ButtonStyle.Secondary)
-                .setDisabled(false);
-    
-            const confirmBtn = new ButtonBuilder()
-                .setCustomId(`remove_${blobId}_confirm`)
-                .setLabel('confirm')
-                .setStyle(ButtonStyle.Success)
-                .setDisabled(false);
-    
-            const helperButtons = new ActionRowBuilder()
-                .addComponents(cancelBtn, confirmBtn);
+                    .setCustomId(`remove_${blobId}_cancel`)
+                    .setLabel('cancel')
+                    .setStyle(ButtonStyle.Secondary)
+                    .setDisabled(false);
+
+                const confirmBtn = new ButtonBuilder()
+                    .setCustomId(`remove_${blobId}_confirm`)
+                    .setLabel('confirm')
+                    .setStyle(ButtonStyle.Success)
+                    .setDisabled(false);
+
+                const helperButtons = new ActionRowBuilder()
+                    .addComponents(cancelBtn, confirmBtn);
 
                 console.log(string)
                 if (!blobId) {
@@ -98,7 +91,7 @@ module.exports = async (interaction, pages, components, initPage=0, time = 60 * 
 
                 console.log(blobId)
 
-                console.log("p ",i.customId)
+                console.log("p ", i.customId)
                 if (string === `confirm`) {
                     await Blob.destroy({ where: { id: blobId } });
                     await interaction.editReply({
@@ -124,23 +117,20 @@ module.exports = async (interaction, pages, components, initPage=0, time = 60 * 
                     });
                 }
 
-                 // await i.deferUpdate();
+            }
 
-               
-              }
-        
-              pageCount.setLabel(`${index + 1}/${pages.length}`);
-              previousBtn.setDisabled(index === 0);
-              nextBtn.setDisabled(index === pages.length - 1);
+            pageCount.setLabel(`${index + 1}/${pages.length}`);
+            previousBtn.setDisabled(index === 0);
+            nextBtn.setDisabled(index === pages.length - 1);
 
-            await msg.edit({ embeds: [pages[index]], components: [buttons,components[index]] }).catch(err => { console.error(err)})
+            await msg.edit({ embeds: [pages[index]], components: [buttons, components[index]] }).catch(err => { console.error(err) })
 
             collector.resetTimer();
 
         });
 
         collector.on("end", async () => {
-            await msg.edit({ embeds: [pages[index]], components: [] }).catch(err => { console.error(err)})
+            await msg.edit({ embeds: [pages[index]], components: [] }).catch(err => { console.error(err) })
         })
 
         return msg;

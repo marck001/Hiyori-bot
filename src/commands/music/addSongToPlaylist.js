@@ -4,7 +4,7 @@ const {
 } = require('discord.js');
 
 const Playlist = require('../../models/Playlist');
-const Song  = require('../../models/Song');
+const Song = require('../../models/Song');
 const { isValidYtUrl } = require('../../modules/blob/validYtUrl')
 module.exports = {
 
@@ -17,8 +17,17 @@ module.exports = {
             required: true,
             type: ApplicationCommandOptionType.String,
             autocomplete: true,
+           /* choices:[ {
+                name: 'break-streak',
+                value: 'break'
+            },
+            {
+              name: 'record-streak',
+              value: 'streak'
+          },],
+*/
         },
-       
+
         {
             name: 'song-url',
             description: 'New Song to add',
@@ -27,6 +36,8 @@ module.exports = {
         },
     ],
     devOnly: true,
+    autocomplete: true, 
+
 
     callback: async (client, interaction) => {
         const name = interaction.options.getString('name');
@@ -35,8 +46,8 @@ module.exports = {
 
         try {
 
-            if(!isValidYtUrl(url)){
-                return  interaction.reply({
+            if (!isValidYtUrl(url)) {
+                return interaction.reply({
                     content: `You must provide a youtube url`,
                     ephemeral: true,
                 });
@@ -46,13 +57,13 @@ module.exports = {
             const guildId = interaction.guild.id;
 
             await interaction.deferReply();
-            const playlist = await Playlist.findOne({where:{ name:name, guildId: guildId }});
+            const playlist = await Playlist.findOne({ where: { name: name, guildId: guildId } });
             if (!playlist) {
                 return interaction.editReply('Playlist not found.');
             }
 
-            const song =  new Song({userId: userId,  playlist: name,  guildId: guildId , url:url});
-            
+            const song = new Song({ userId: userId, playlist: name, guildId: guildId, url: url });
+
             await song.save();
 
             await interaction.followUp({
@@ -60,7 +71,7 @@ module.exports = {
                 ephemeral: true
             });
 
-        }catch (err) {
+        } catch (err) {
 
             console.log(err)
             await interaction.followUp({
@@ -80,15 +91,20 @@ module.exports = {
 
         try {
 
-            console.log("Autocomplete invoked"); 
-           
-            const playlists = await Playlist.findAll({ where: { guildId: guildId } });
-            
-         
+            console.log("Autocomplete invoked");
+
+            const playlists = await Playlist.findAll({ where: { guildId } });
+
+
             const filteredPlaylists = playlists
                 .filter(playlist => playlist.name && playlist.name.toLowerCase().startsWith(focusedValue.toLowerCase()));
 
-          
+            if (!filteredPlaylists.length) {
+                await interaction.respond([{ name: 'No playlists found', value: 'none' }]);
+                return;
+            }
+
+
             await interaction.respond(
                 filteredPlaylists.map(playlist => ({
                     name: playlist.name,
@@ -98,7 +114,7 @@ module.exports = {
             console.log(guildId)
         } catch (err) {
             console.error('Error in autocomplete:', err);
-            await interaction.respond([]); 
+            await interaction.respond([]);
         }
     },
 };
