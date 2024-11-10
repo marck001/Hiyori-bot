@@ -1,5 +1,5 @@
 const { VoiceConnectionStatus } = require('@discordjs/voice');
-const { isVoiceChannel } =require("../../modules/voice-channels/isVoiceChannel")
+const { isVoiceChannel } =require("../../functions/voice-channels/isVoiceChannel")
 module.exports = {
   name: 'join-vc',
   description: 'Joins the voice channel where you are in',

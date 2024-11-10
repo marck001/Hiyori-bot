@@ -2,8 +2,8 @@ const {
   ApplicationCommandOptionType,
   PermissionFlagsBits, ChannelType,
 } = require('discord.js');
-const { isVoiceChannel } = require('../../modules/voice-channels/isVoiceChannel')
-const { isValidYtUrl } = require('../../modules/blob/validYtUrl')
+const { isVoiceChannel } = require('../../functions/voice-channels/isVoiceChannel')
+const { isValidYtUrl } = require('../../functions/blob/validYtUrl')
 module.exports = {
 
   name: 'play',

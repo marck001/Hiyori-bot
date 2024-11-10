@@ -4,7 +4,7 @@ const {
   } = require('discord.js');
   
   const Counter = require('../../models/Counter'); 
-  const { chunkArray } = require('../../modules/streak/splitArray');
+  const { chunkArray } = require('../../functions/streak/splitArray');
   const  pagination = require('../../components/buttons/pajination')
   module.exports = {
     name: 'streak-stats-test',

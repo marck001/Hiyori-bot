@@ -1,5 +1,5 @@
 const { getVoiceConnection, VoiceConnectionStatus } = require('@discordjs/voice');
-const { isVoiceChannel } =require("../../modules/voice-channels/isVoiceChannel")
+const { isVoiceChannel } =require("../../functions/voice-channels/isVoiceChannel")
 module.exports = {
   name: 'leave-vc',
   description: 'Leaves the voice channel where you are in',

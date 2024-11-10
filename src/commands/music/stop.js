@@ -1,5 +1,5 @@
-const { VoiceConnectionStatus } = require('@discordjs/voice');
-const { isVoiceChannel } =require("../../modules/voice-channels/isVoiceChannel")
+
+const { isVoiceChannel } =require("../../functions/voice-channels/isVoiceChannel")
 module.exports = {
     name: 'stop',
     description: 'Stops the current music being played',

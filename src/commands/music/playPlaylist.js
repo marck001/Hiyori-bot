@@ -2,7 +2,7 @@ const {
   ApplicationCommandOptionType,
 
 } = require('discord.js');
-const { isVoiceChannel } = require('../../modules/voice-channels/isVoiceChannel')
+const { isVoiceChannel } = require('../../functions/voice-channels/isVoiceChannel')
 const Song = require('../../models/Song');
 const Playlist = require('../../models/Playlist');
 

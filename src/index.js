@@ -50,12 +50,6 @@ const ytdl = require('ytdl-core');
 
     eventHandler(client);
 
-    client.on('messageCreate', (message) => {
-      countStickerStreak(message, client);
-      countEmoji(message, client);
-      /* messageHandler(client, message); */
-    });
-
     client.on('ready', (c) => {
       client.user.setActivity('Testing in production');
 

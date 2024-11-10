@@ -1,12 +1,21 @@
+const { Client, Message } = require('discord.js');
+require('dotenv').config();
+
 const Counter = require('../../models/Counter');
 let lastStickerId = null;
 let streakCount = 0;
 let lastStickerName = '';
 require('dotenv').config();
-const { getRandomUlr} = require('../blob/getRandomUrl');
+const { getRandomUlr} = require('../../functions/blob/getRandomUrl');
 
 let highestStreak = null;
 
+
+/**
+ *
+ * @param {Client} client
+ * @param {Message} message
+ */
 
 async function updateHighestStreak(guildId) {
     if (!highestStreak) {
@@ -19,11 +28,13 @@ async function updateHighestStreak(guildId) {
 }
 
 
-async function countStickerStreak(message, client) {
+module.exports =  async (client, message) => {
 
+    
     try {
         const channel = client.channels.cache.get(process.env.CHANNEL_ID);
 
+      
         //const streakChannel = client.channels.cache.get(process.env.STREAK_ID);
 
         if (!message.stickers.size || !channel || message.channel.id !== process.env.CHANNEL_ID) return;
@@ -76,6 +87,7 @@ async function countStickerStreak(message, client) {
     } catch (err) {
         console.log("There was an error: ", err)
     }
-}
+   
 
-module.exports = { countStickerStreak };
+
+};

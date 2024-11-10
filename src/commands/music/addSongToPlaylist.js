@@ -5,7 +5,7 @@ const {
 
 const Playlist = require('../../models/Playlist');
 const Song = require('../../models/Song');
-const { isValidYtUrl } = require('../../modules/blob/validYtUrl')
+const { isValidYtUrl } = require('../../functions/blob/validYtUrl')
 module.exports = {
 
     name: 'add-song',
