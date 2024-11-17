@@ -55,7 +55,7 @@ Start the bot with the following command:
    npx nodemon index.js
    ```
    short way
-    ```bash
+   ```bash
    nodemon 
    ```
 
