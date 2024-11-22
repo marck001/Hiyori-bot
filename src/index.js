@@ -10,8 +10,6 @@ const ytdl = require('ytdl-core');
 
     const { Client, IntentsBitField, Message } = require('discord.js');
     const eventHandler = require('./handlers/eventHandler');
-    const { countStickerStreak } = require('./functions/general/sticker-counter')
-    const { countEmoji } = require('./functions/general/emoji-counter')
 
     const client = new Client({
       intents: [

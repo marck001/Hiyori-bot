@@ -12,11 +12,11 @@ module.exports = async (client, interaction) => {
     const localCommands = getLocalCommands();
     const commandObject = localCommands.find(cmd => cmd.name === interaction.commandName);
 
-    console.log('hello from working')
+  
     if (!commandObject || typeof commandObject.autocomplete !== 'function') return;
 
     try {
-      console.log(`Autocomplete for command: ${commandObject.name}`);
+     // console.log(`Autocomplete for command: ${commandObject.name}`);
       await commandObject.autocomplete(interaction);
     } catch (error) {
       console.error(`Error in autocomplete for command ${commandObject.name}:`, error);

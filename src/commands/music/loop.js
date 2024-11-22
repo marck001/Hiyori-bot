@@ -1,6 +1,6 @@
 const {
     ApplicationCommandOptionType,
-    PermissionFlagsBits, ChannelType,
+
 } = require('discord.js');
 const { isVoiceChannel } = require('../../functions/voice-channels/isVoiceChannel')
 module.exports = {
@@ -22,6 +22,13 @@ module.exports = {
         const modeOption = interaction.options.get("mode");
         const num = modeOption ? modeOption.value : 0;
 
+        if(num>2 || num<0)
+            return interaction.reply({
+                content: `No valid mode \n Please try: 0 (Off), 1 (Song), 2 (Queue) `,
+                ephemeral: true
+            });
+    
+
 
         try {
 
@@ -34,7 +41,7 @@ module.exports = {
             const queue = client.distube.getQueue(interaction);
 
             if (!queue) {
-                await interaction.followUp({
+                await interaction.editReply({
                     content: `There's no queue`,
                     ephemeral: true
                 });

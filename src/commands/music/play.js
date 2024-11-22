@@ -7,7 +7,7 @@ const { isValidYtUrl } = require('../../functions/blob/validYtUrl')
 module.exports = {
 
   name: 'play',
-  description: 'Plays music',
+  description: 'Play music or add to current queue',
   options: [
     {
       name: 'music-url',
@@ -27,7 +27,7 @@ module.exports = {
       const voiceChannel = interaction.member.voice.channel;
 
       
-      if (!isVoiceChannel(interaction) ) return;
+      if (!isVoiceChannel(interaction)) return;
 
       if(!isValidYtUrl(url)){
         return  interaction.reply({content:"You must provide a valid yt url",ephemeral:true});
