@@ -6,7 +6,7 @@ const { Collection } = require('discord.js');
 module.exports = async (client, interaction) => {
 
 
-  console.log('Interaction detected:', interaction.type);
+  //console.log('Interaction detected:', interaction.type);
   if (interaction.isAutocomplete()) {
 
     const localCommands = getLocalCommands();

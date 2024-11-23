@@ -5,6 +5,7 @@ const {
 
 const Playlist = require('../../models/Playlist');
 const Song = require('../../models/Song');
+const { hasRole} = require('../../functions/general/hasRole')
 const { isValidYtUrl } = require('../../functions/blob/validYtUrl')
 module.exports = {
 
@@ -52,6 +53,8 @@ module.exports = {
                     ephemeral: true,
                 });
             }
+
+            if(!hasRole(interaction)) return;
 
             const userId = interaction.user.id;
             const guildId = interaction.guild.id;

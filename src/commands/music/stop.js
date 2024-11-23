@@ -1,4 +1,4 @@
-
+const { hasRole} = require('../../functions/general/hasRole')
 const { isVoiceChannel } =require("../../functions/voice-channels/isVoiceChannel")
 module.exports = {
     name: 'stop',
@@ -10,7 +10,7 @@ module.exports = {
 
         try {
 
-            if (!isVoiceChannel(interaction)) return;
+            if (!isVoiceChannel(interaction) ||!hasRole(interaction)) return;
 
             const queue = client.distube.getQueue(interaction);
 

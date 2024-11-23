@@ -3,6 +3,7 @@ const {
     PermissionFlagsBits, ChannelType,
   } = require('discord.js');
   const { isVoiceChannel } = require('../../functions/voice-channels/isVoiceChannel')
+  const { hasRole} = require('../../functions/general/hasRole')
   module.exports = {
   
     name: 'autoplay',
@@ -18,14 +19,14 @@ const {
     devOnly: true,
   
     callback: async (client, interaction) => {
-      const  playlist = interaction.options.getString('playlist');
+      //const  playlist = interaction.options.getString('playlist');
   
   
       try {
   
         const voiceChannel = interaction.member.voice.channel;
   
-        if (!isVoiceChannel(interaction)) return;
+        if (!isVoiceChannel(interaction) ||!hasRole(interaction)) return;
   
         console.log('first')
         await interaction.deferReply();

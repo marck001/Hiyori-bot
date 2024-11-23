@@ -1,6 +1,6 @@
 
 const { isVoiceChannel } = require('../../functions/voice-channels/isVoiceChannel')
-
+const { hasRole} = require('../../functions/general/hasRole')
 module.exports = {
 
     name: 'shuffle',
@@ -11,7 +11,7 @@ module.exports = {
 
         try {
 
-            if (!isVoiceChannel(interaction)) return; 
+            if (!isVoiceChannel(interaction) ||!hasRole(interaction)) return; 
 
             await interaction.deferReply();
           //  const voiceChannel = interaction.member.voice.channel;

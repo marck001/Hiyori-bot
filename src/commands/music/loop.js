@@ -3,6 +3,7 @@ const {
 
 } = require('discord.js');
 const { isVoiceChannel } = require('../../functions/voice-channels/isVoiceChannel')
+const { hasRole} = require('../../functions/general/hasRole')
 module.exports = {
 
     name: 'loop',
@@ -32,7 +33,7 @@ module.exports = {
 
         try {
 
-            if (!isVoiceChannel(interaction)) return; 
+            if (!isVoiceChannel(interaction) ||!hasRole(interaction)) return; 
 
             await interaction.deferReply();
             
