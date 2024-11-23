@@ -49,7 +49,7 @@ const ytdl = require('ytdl-core');
     eventHandler(client);
 
     client.on('ready', (c) => {
-      client.user.setActivity('Testing in production');
+      client.user.setActivity('Music');
 
     });
 
