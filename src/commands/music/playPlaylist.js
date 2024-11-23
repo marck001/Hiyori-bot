@@ -3,8 +3,10 @@ const {
 
 } = require('discord.js');
 const { isVoiceChannel } = require('../../functions/voice-channels/isVoiceChannel')
+const { hasRole} = require('../../functions/general/hasRole')
 const Song = require('../../models/Song');
 const Playlist = require('../../models/Playlist');
+
 
 module.exports = {
 
@@ -53,7 +55,8 @@ module.exports = {
       const voiceChannel = interaction.member.voice.channel;
       const guildId = interaction.guild.id;
 
-      if (!isVoiceChannel(interaction)) return;
+      if (!isVoiceChannel(interaction) ||!hasRole(interaction)) return;
+
 
       await interaction.deferReply();
  
