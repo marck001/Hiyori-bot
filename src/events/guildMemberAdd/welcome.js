@@ -11,12 +11,6 @@ const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
 
 module.exports = async (client, member) => {
 
-
-
-    console.log("loading")
-
-
-    console.log(`New member joined: ${member.displayName}`);
     console.log('working')
     if (!member.guild) return;
 
@@ -27,21 +21,30 @@ module.exports = async (client, member) => {
 
         ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 
+
+        const avatarX = canvas.width / 2;
+        const avatarY = canvas.height / 2;
+        const avatarRadius = 120;
+
         const { body } = await request(member.displayAvatarURL({ extension: 'jpg' }));
         const avatar = await Canvas.loadImage(await body.arrayBuffer());
-
-
+        ctx.save();
 
         ctx.beginPath();
-
-        ctx.arc(125, 125, 100, 0, Math.PI * 2, true);
-
+        ctx.arc(avatarX, avatarY, avatarRadius, 0, Math.PI * 2, true);
         ctx.closePath();
-
         ctx.clip();
+        ctx.drawImage(avatar, avatarX - avatarRadius, avatarY - avatarRadius, avatarRadius * 2, avatarRadius * 2);
+        ctx.restore();
 
-        ctx.drawImage(avatar, 25, 25, 200, 200);
+
+        ctx.font = '65px sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText('Welcome to our server!', canvas.width / 5, canvas.height / 3.5);
+
+
         ctx.font = applyText(canvas, member.displayName);
+        console.log('Font after applyText:', ctx.font);
         ctx.fillStyle = '#ffffff';
 
         ctx.fillText(
@@ -49,6 +52,8 @@ module.exports = async (client, member) => {
             canvas.width / 2 - ctx.measureText(member.displayName).width / 2,
             canvas.height - 100
         );
+        console.log(member.displayName)
+
 
         const attachment = new AttachmentBuilder(await canvas.encode('png'), { name: 'welcome-image.png' });
 
@@ -60,15 +65,12 @@ module.exports = async (client, member) => {
             return;
         }
 
-
         channel.send({ files: [attachment] });
         console.log('finished')
 
     } catch (err) {
         console.error("Error processing welcome image:", err);
     }
-
-
 };
 
 function applyText(canvas, text) {
@@ -76,7 +78,7 @@ function applyText(canvas, text) {
     let fontSize = 70;
 
     do {
-        ctx.font = `${fontSize -= 10}px sans-serif`;
+        ctx.font = `${fontSize -= 10}px Arial`;
     } while (ctx.measureText(text).width > canvas.width - 300);
 
     return ctx.font;
