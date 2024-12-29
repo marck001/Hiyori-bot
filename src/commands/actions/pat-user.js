@@ -7,7 +7,7 @@ const path = require('path');
 
 
   module.exports = {
-    deleted: false,
+    deleted: true,
     name: 'pat-user',
     description: 'Pats an user from this server',
     options: [
