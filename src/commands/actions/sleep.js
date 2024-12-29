@@ -7,7 +7,7 @@ const path = require('path');
 
 
   module.exports = {
-    deleted: false,
+    deleted: true,
     name: 'goodnight',
     description: 'Wish a good night to someone',
     options: [
