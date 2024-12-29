@@ -19,7 +19,8 @@ const ytdl = require('ytdl-core');
         IntentsBitField.Flags.MessageContent,
         IntentsBitField.Flags.GuildVoiceStates,
         IntentsBitField.Flags.GuildMessageReactions,
-        IntentsBitField.Flags.GuildIntegrations
+        IntentsBitField.Flags.GuildIntegrations,
+        IntentsBitField.Flags.GuildEmojisAndStickers,
 
       ],
     });
