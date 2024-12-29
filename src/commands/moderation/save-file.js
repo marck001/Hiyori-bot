@@ -38,7 +38,7 @@ const {
         ]
       },
     ],
-    deleted: false,
+    deleted: true,
     permissionsRequired: [PermissionFlagsBits.Administrator],
     botPermissions: [PermissionFlagsBits.Administrator],
     devOnly: true,
