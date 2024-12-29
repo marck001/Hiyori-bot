@@ -17,7 +17,7 @@ const {
         type: ApplicationCommandOptionType.Number,
       },
     ],
-    deleted: false,
+    deleted: true,
     devOnly: true,
   
     callback: async (client, interaction) => {
