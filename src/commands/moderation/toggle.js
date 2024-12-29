@@ -12,6 +12,7 @@ module.exports = {
     permissionsRequired: [PermissionFlagsBits.Administrator],
     botPermissions: [PermissionFlagsBits.Administrator],
     devOnly: true,
+    deleted: true,
 
     callback: async (client, interaction) => {
 
