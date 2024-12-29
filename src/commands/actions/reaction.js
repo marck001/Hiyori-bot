@@ -24,6 +24,7 @@ module.exports = {
 
   ],
   devOnly: true,
+  deleted: true,
   permissionsRequired: [PermissionFlagsBits.Administrator],
   botPermissions: [PermissionFlagsBits.Administrator],
 
