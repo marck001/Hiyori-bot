@@ -6,7 +6,7 @@ const {
 const path = require('path');
 
   module.exports = {
-    deleted: false,
+    deleted: true,
     name: 'pat-me',
     description: 'Pats enjoyed bot',
     devOnly: true,
