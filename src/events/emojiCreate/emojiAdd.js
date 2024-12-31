@@ -2,11 +2,11 @@ const { request } = require('undici');
 
 module.exports = async (client, newEmoji) => {
 
-    console.log("working emojis");
+   
 
     try {
 
-        console.log(newEmoji);
+       
 
 
         if (!newEmoji.guild) {
@@ -24,7 +24,7 @@ module.exports = async (client, newEmoji) => {
 
 
         const channel = newEmoji.guild.channels.cache.get('1307350353863250051');
-        const channel2 = newEmoji.guild.channels.cache.get('1277232456201670708');
+       
         if (!channel) {
             console.error("Channel not found!");
             return;
@@ -35,10 +35,7 @@ module.exports = async (client, newEmoji) => {
         ? `<a:${newEmoji.name}:${newEmoji.id}>`
         : `<:${newEmoji.name}:${newEmoji.id}>`;
 
-
-        await channel.send(`New emoji uploaded: ${emojiString}`);
-
-        await channel2.send({
+        await channel.send({
             content: `${newEmoji.name}: ${emojiString}`,
             files: [
                 {
