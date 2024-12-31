@@ -31,13 +31,15 @@ module.exports = async (client, newEmoji) => {
         }
 
 
-        const emojiString = `<:${newEmoji.name}:${newEmoji.id}>`;
+        const emojiString = newEmoji.animated
+        ? `<a:${newEmoji.name}:${newEmoji.id}>`
+        : `<:${newEmoji.name}:${newEmoji.id}>`;
 
 
         await channel.send(`New emoji uploaded: ${emojiString}`);
 
         await channel2.send({
-            content: `${newEmoji.name}: <:${newEmoji.name}:${newEmoji.id}>`,
+            content: `${newEmoji.name}: ${emojiString}`,
             files: [
                 {
                     attachment: Buffer.from(imageBuffer),  
