@@ -3,16 +3,18 @@ const fs = require('fs');
 const path = require('path');
 const Canvas = require('@napi-rs/canvas');
 const { request } = require('undici');
-
+const { GlobalFonts } = Canvas
 
 const filePath = path.join(__dirname, '../../../data/welcome.json');
 const jsonData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+GlobalFonts.registerFromPath(path.join(__dirname, '../../../data/fonts/impact.ttf'), 'Impact');
+GlobalFonts.registerFromPath(path.join(__dirname, '../../../data/fonts/arial.ttf'), 'Arial');
 
 
 module.exports = async (client, member) => {
 
 
-    console.log('working')
+
     if (!member.guild) return;
 
     try {
@@ -96,7 +98,9 @@ module.exports = async (client, member) => {
             content: message,
             files: [attachment]
         });
-        console.log('finished')
+       
+        await new Promise(resolve => setTimeout(resolve, 10000)); 
+        channel.send(`Say hi at <#1233440339818184735> ${emojisArray[0]}`);
 
     } catch (err) {
         console.error("Error processing welcome image:", err);
