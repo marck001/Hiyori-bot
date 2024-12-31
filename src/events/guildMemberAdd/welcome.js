@@ -9,7 +9,7 @@ const filePath = path.join(__dirname, '../../../data/welcome.json');
 const jsonData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
 
 
-module.exports = async (client,member) => {
+module.exports = async (client, member) => {
 
 
     console.log('working')
@@ -22,6 +22,7 @@ module.exports = async (client,member) => {
         const astArray = jsonData.assets;
         let randIndex = Math.floor(Math.random() * astArray.length);
         const data = astArray[randIndex]
+        const emojisArray = data.emojis
 
         const background = await Canvas.loadImage(data.background);
 
@@ -46,10 +47,10 @@ module.exports = async (client,member) => {
         ctx.beginPath();
         ctx.arc(avatarX, avatarY, avatarRadius, 0, Math.PI * 2, true);
         ctx.closePath();
-        ctx.lineWidth = 5; 
-        ctx.strokeStyle = data.bgColor; 
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = '#000000';
         ctx.stroke();
-      
+
 
 
         ctx.font = '65px Impact';
@@ -59,15 +60,15 @@ module.exports = async (client,member) => {
         ctx.strokeText(jsonData.title, canvas.width / 5, canvas.height / 4);
         ctx.fillText(jsonData.title, canvas.width / 5, canvas.height / 4);
 
-        drawText(ctx, member.displayName, canvas.width /2 - ctx.measureText(member.displayName).width / 2, canvas.height - 100, {
+        drawText(ctx, member.displayName, canvas.width / 2 - ctx.measureText(member.displayName).width / 2, canvas.height - 100, {
             padding: 10,
             bgColor: data.bgColor,
             textColor: '#ffffff',
             font: applyText(canvas, member.displayName),
         });
 
-        const counterString = `member #${member.guild.memberCount}`;
-        drawText(ctx,counterString, canvas.width /2 - ctx.measureText(counterString).width / 2.5, 80, {
+        const counterString = `Member #${member.guild.memberCount}`;
+        drawText(ctx, counterString, canvas.width / 2 - ctx.measureText(counterString).width / 2.5, 80, {
             padding: 5,
             bgColor: data.bgColor,
             textColor: '#ffffff',
@@ -84,13 +85,17 @@ module.exports = async (client,member) => {
             console.error("Channel not found:", jsonData.channel);
             return;
         }
-        const message = `Hi hello <:ElivWave:1297900289789136936> welcome to our server. Glad to see new people joining us <@${member.id}> #${member.guild.memberCount}. We are ⚔ Secret Base ⚔ <:ElivCoolFumo:1258054855675740292> . 
-        We are hoping to know you better. Hope you like been here. Thank you <:ElivThankYou:1295009702530515005>`
+        const message = `Hi hello ${emojisArray[0]} welcome to our server. Glad to see new people joining us <@${member.id}> #${member.guild.memberCount}. We are ⚔ Secret Base ⚔ ${emojisArray[1]} . 
+              
+            We are hoping to know you better. Hope you like been here. Thank you <:ElivThankYou:1295009702530515005>
+            
+            `
 
 
-        channel.send({ 
+        channel.send({
             content: message,
-            files: [attachment] });
+            files: [attachment]
+        });
         console.log('finished')
 
     } catch (err) {
@@ -129,7 +134,9 @@ function drawText(ctx, text, x, y, options = {}) {
     ctx.fillStyle = bgColor;
     ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
 
-   
+    ctx.strokeStyle = '#000000';
     ctx.fillStyle = textColor;
+    ctx.lineWidth = 2;
+    ctx.strokeText(text, x, y);
     ctx.fillText(text, x, y);
 }
