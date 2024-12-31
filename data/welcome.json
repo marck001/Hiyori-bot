@@ -1,7 +1,34 @@
 {
-    "title": "Welcome to",
-    "background": "https://embed.pixiv.net/artwork.php?illust_id=115484684&mdate=1706206868",
-    "message": [""],
-    "auxiliar-img": "",
+    "title": "Welcome to our Server!",
+    "assets": [
+        {
+            "background": "https://embed.pixiv.net/artwork.php?illust_id=115484684&mdate=1706206868",
+            "message": "",
+            "emojis": ["<a:evilWave:1323482494728802364>","<:ElivCoolFumo:1258054855675740292>"],
+            "bgColor": "rgba(242, 18, 18, 0.4)",
+            "text-color": ""
+        },
+        {
+            "background": "https://preview.redd.it/neuro-sama-v0-rj4qwzitabla1.jpg?width=1080&crop=smart&auto=webp&s=2eb764682db56064e993f74979796e59d3f4a902",
+            "message": "",
+            "emojis": ["<a:neuroWave:1323482527205294193>","<:CoolFumo:1253616771865378906>"],
+            "bgColor": "rgba(0, 252, 255, 0.4)",
+            "text-color": ""
+        },
+        {
+            "background": "https://preview.redd.it/another-atri-edit-but-hiyori-v0-qyx8yc1zusfd1.png?width=640&crop=smart&auto=webp&s=23ff671f0ed3707a016b829b0e55fde90265b601",
+            "message": "",
+            "emojis": ["<a:hiyoriWave:1323482516375605318>","<a:hiyoriSpin:1323482504447131773>"],
+            "bgColor": "",
+            "text-color": "rgba(184, 189, 184, 0.59)"
+        },
+        {
+            "background": "https://cdn.discordapp.com/attachments/1257519400374898711/1323487840893403156/BG.png?ex=6774b19a&is=6773601a&hm=e8f757d72a242e580e70ca15fa5d762b59caed8630125026be8d94fc02a1c229&",
+            "message": "",
+            "emojis": ["<a:nereWaveA:1323488478876532759>","<:nereCoolFumo:1296519874876670004>"],
+            "bgColor": "rgba(0, 255, 77, 0.4)",
+            "text-color": ""
+        }
+    ],
     "channel": "1257519400374898711"
 }
