@@ -6,8 +6,8 @@ let lastStickerId = null;
 let streakCount = 0;
 let lastStickerName = '';
 require('dotenv').config();
-const { getRandomUlr} = require('../../functions/blob/getRandomUrl');
-
+const { getRandomUlr } = require('../../functions/blob/getRandomUrl');
+const streakRecordCanva = require('../../components/canvas/streakRecord');
 let highestStreak = null;
 
 
@@ -28,13 +28,13 @@ async function updateHighestStreak(guildId) {
 }
 
 
-module.exports =  async (client, message) => {
+module.exports = async (client, message) => {
 
-    
+
     try {
         const channel = client.channels.cache.get(process.env.CHANNEL_ID);
 
-      
+
         //const streakChannel = client.channels.cache.get(process.env.STREAK_ID);
 
         if (!message.stickers.size || !channel || message.channel.id !== process.env.CHANNEL_ID) return;
@@ -51,7 +51,7 @@ module.exports =  async (client, message) => {
                     break;
                 case (streakCount % 100 === 0):
                     channel.send(`Wow, **${stickerName}** has a streak of **${streakCount}**! <:hiyoriHeart:1280172714283237406>`);
-                    channel.send( await getRandomUlr() || 'No files stored :(')
+                    channel.send(await getRandomUlr() || 'No files stored :(')
                     break;
                 case (streakCount % 5 === 0):
                     channel.send(`**${stickerName}** has a streak of **${streakCount}**!`);
@@ -63,21 +63,21 @@ module.exports =  async (client, message) => {
                 const userMention = `<@${message.author.id}>`;
                 channel.send(`${userMention} broke the **${lastStickerName}** streak of ${streakCount}!`);
 
-                  await updateHighestStreak(message.guild.id);
+                await updateHighestStreak(message.guild.id);
 
-                  if (streakCount > highestStreak) {
+                if (streakCount > highestStreak) {
                     const newCounter = await Counter.create({
-                      userId: message.author.id,
-                      guildId: message.guild.id,
-                      stickerName: lastStickerName,
-                      streak: streakCount,
-                      date: new Date(), 
+                        userId: message.author.id,
+                        guildId: message.guild.id,
+                        stickerName: lastStickerName,
+                        streak: streakCount,
+                        date: new Date(),
                     });
-          
+                    await streakRecordCanva(streakCount, sticker, highestStreak, message.author,channel)
+
                     highestStreak = streakCount;
                     console.log(newCounter.toJSON());
-                    channel.send(`*The new current streak record is* **${streakCount}**! \n <:hiyoriHeart:1280172714283237406>`);
-                  }
+                }
             }
             streakCount = 1;
             lastStickerId = stickerId;
@@ -87,7 +87,7 @@ module.exports =  async (client, message) => {
     } catch (err) {
         console.log("There was an error: ", err)
     }
-   
+
 
 
 };
