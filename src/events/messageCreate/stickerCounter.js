@@ -11,6 +11,7 @@ const streakRecordCanva = require('../../components/canvas/streakRecord');
 let highestStreak = null;
 
 
+
 /**
  *
  * @param {Client} client
@@ -58,14 +59,14 @@ module.exports = async (client, message) => {
                     break;
             }
         } else {
-            if (streakCount >= 5) {
+            if (streakCount >= 1) {
                 console.log(`Streak was broken`);
                 const userMention = `<@${message.author.id}>`;
                 channel.send(`${userMention} broke the **${lastStickerName}** streak of ${streakCount}!`);
 
                 await updateHighestStreak(message.guild.id);
 
-                if (streakCount > highestStreak) {
+                if (streakCount > 0) {
                     const newCounter = await Counter.create({
                         userId: message.author.id,
                         guildId: message.guild.id,

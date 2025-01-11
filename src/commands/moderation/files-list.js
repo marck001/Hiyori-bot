@@ -16,8 +16,14 @@ const {
         required: false,
         type: ApplicationCommandOptionType.Number,
       },
+      {
+        name: 'user',
+        description: 'Check images uploaded by a user',
+        required: false,
+        type: ApplicationCommandOptionType.User,
+      },
     ],
-    deleted: true,
+    deleted: false,
     permissionsRequired: [PermissionFlagsBits.Administrator],
     botPermissions: [PermissionFlagsBits.Administrator],
     devOnly: true,
@@ -25,15 +31,26 @@ const {
     callback: async (client, interaction) => {
      
       const page = interaction.options.getNumber('page') || 1;
+      const user =  interaction.options.get('user').value
   
       try {
-        const blobs = await Blob.findAll({
-          where: { guildId: interaction.guild.id },
-          order: [['id', 'DESC']],
-        });
-  
+
+        let blobs;
+
+        if(!user){
+          blobs = await Blob.findAll({
+            where: { guildId: interaction.guild.id },
+            order: [['id', 'DESC']],
+          });
+        }else{
+          blobs = await Blob.findAll({
+            where: { guildId: interaction.guild.id ,userId:user },
+            order: [['id', 'DESC']],
+          });
+        }
+       
         if (blobs.length === 0) {
-          return interaction.reply('No files were found.');
+          return interaction.reply(`It seems like there's nothing stored.`);
         }
      
         let embeds = [];
@@ -86,7 +103,7 @@ const {
   
   
       } catch (error) {
-        console.error('Error fetching streaks:', error);
+        console.error(' Error fetching streaks:', error);
         interaction.reply('An error occurred while fetching streaks.');
       }
     },
