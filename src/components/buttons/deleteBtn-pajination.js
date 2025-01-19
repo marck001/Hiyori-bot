@@ -1,144 +1,165 @@
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js')
 const Blob = require('../../models/Blob');
-
+const { admin } = require('../../../config.json');
 module.exports = async (interaction, pages, components, initPage = 0, time = 60 * 1000) => {
 
 
-    try {
+    if (!interaction || !pages || pages.length === 0)
+        throw new Error("[PAGINATION] Invalid arguments");
 
-        if (!interaction || !pages || pages.length === 0) throw new Error('[PAGINATION] Invalid args')
+    const ADMIN_ROLE_ID = admin; 
 
-        await interaction.deferReply();
+    let index = initPage;
 
+    const createNavigationButtons = (index) => {
+        return new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setCustomId("previous")
+                .setLabel("⬅️")
+                .setStyle(ButtonStyle.Secondary)
+                .setDisabled(index === 0),
+            new ButtonBuilder()
+                .setCustomId("pagecount")
+                .setLabel(`${index + 1}/${pages.length}`)
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(true),
+            new ButtonBuilder()
+                .setCustomId("next")
+                .setLabel("➡️")
+                .setStyle(ButtonStyle.Secondary)
+                .setDisabled(index === pages.length - 1)
+        );
+    };
 
-        if (pages.length === 1) {
-            return await interaction.editReply({ embeds: pages, components: [], fetchReply: true })
+    const buttons = createNavigationButtons(index);
+
+    const msg = await interaction.editReply({
+        embeds: [pages[index]],
+        components: [buttons, components[index]],
+        fetchReply: true,
+    });
+
+    const collector = msg.createMessageComponentCollector({
+        componentType: ComponentType.Button,
+        time,
+    });
+
+    collector.on("collect", async (i) => {
+        if (i.user.id !== interaction.user.id) {
+            return i.reply({
+                content: "You cannot interact with these buttons.",
+                ephemeral: true,
+            });
         }
 
-        let index = initPage;
+        await i.deferUpdate();
 
-        const previousBtn = new ButtonBuilder()
-            .setCustomId('previous')
-            .setLabel('⬅️')
-            .setStyle(ButtonStyle.Secondary)
-            .setDisabled(index === 0);
+        if (i.customId === "previous" && index > 0) index--;
+        if (i.customId === "next" && index < pages.length - 1) index++;
 
-        const pageCount = new ButtonBuilder()
-            .setCustomId('pagecount')
-            .setLabel(`${index + 1}/${pages.length}`)
-            .setStyle(ButtonStyle.Primary)
-            .setDisabled(true);
+        if (i.customId.startsWith("remove_")) {
+            const blobId = i.customId.split("_")[1];
+            const blob = await Blob.findOne({ where: { id: blobId } });
 
-        const nextBtn = new ButtonBuilder()
-            .setCustomId('next')
-            .setLabel('➡️')
-            .setStyle(ButtonStyle.Secondary)
-            .setDisabled(index === pages.length - 1);
-
-        const buttons = new ActionRowBuilder()
-            .addComponents(previousBtn, pageCount, nextBtn);
-
-        const msg = await interaction.editReply({ embeds: [pages[index]], components: [buttons, components[index]], fetchReply: true })
-
-
-        const collector = await msg.createMessageComponentCollector({
-            componentType: ComponentType.Button,
-            time,
-        });
-
-
-        collector.on('collect', async i => {
-            if (i.user.id !== interaction.user.id) return await i.reply({ content: `${interaction.user.username} cannot use them!`, ephemeral: true });
-
-            await i.deferUpdate();
-
-            switch (i.customId) {
-                case 'previous':
-                    if (index > 0) index--;
-                    break;
-                case 'next':
-                    if (index < pages.length - 1) index++;
-                    break;
-
+            if (!blob) {
+                return await interaction.editReply({
+                    content: `File with ID ${blobId} does not exist.`,
+                    components: [],
+                });
             }
 
-            if (i.customId.startsWith('remove_')) {
-                const parts = i.customId.split('_');
-                const blobId = parts[1];
-                const string = parts[2];
+            const isOwner = blob.userId === i.user.id;
+            const isAdmin = interaction.member.roles.cache.has(ADMIN_ROLE_ID);
 
+            if (!isOwner && !isAdmin) {
+                return await i.followUp({
+                    content: "You do not have permission to delete this file. If you're a member you can only delete your own files :)",
+                    ephemeral: true,
+                });
+            }
 
-                const cancelBtn = new ButtonBuilder()
-                    .setCustomId(`remove_${blobId}_cancel`)
-                    .setLabel('cancel')
+            const confirmButtons = new ActionRowBuilder().addComponents(
+                new ButtonBuilder()
+                    .setCustomId(`confirm_remove_${blobId}`)
+                    .setLabel("Confirm")
+                    .setStyle(ButtonStyle.Danger),
+                new ButtonBuilder()
+                    .setCustomId(`cancel_remove_${blobId}`)
+                    .setLabel("Cancel")
                     .setStyle(ButtonStyle.Secondary)
-                    .setDisabled(false);
+            );
 
-                const confirmBtn = new ButtonBuilder()
-                    .setCustomId(`remove_${blobId}_confirm`)
-                    .setLabel('confirm')
-                    .setStyle(ButtonStyle.Success)
-                    .setDisabled(false);
+            return await interaction.editReply({
+                content: `Are you sure you want to delete the file with ID ${blobId}?`,
+                components: [confirmButtons],
+            });
+        }
 
-                const helperButtons = new ActionRowBuilder()
-                    .addComponents(cancelBtn, confirmBtn);
+        if (i.customId.startsWith("confirm_remove_")) {
+            const blobId = i.customId.split("_")[2];
+            const blob = await Blob.findOne({ where: { id: blobId } });
 
-                console.log(string)
-                if (!blobId) {
-                    console.error("Invalid blob ID");
-                    return;
-                }
-
-                console.log(blobId)
-
-                console.log("p ", i.customId)
-                if (string === `confirm`) {
-                    await Blob.destroy({ where: { id: blobId } });
-                    await interaction.editReply({
-                        content: `**File with ID (${blobId}) removed successfully!**`,
-                        components: [],
-                        ephemeral: true
-                    });
-                    collector.stop();
-                    return;
-                } else if (string === `cancel`) {
-                    await interaction.editReply({
-                        content: `**Cancelled**`,
-                        components: [],
-                        ephemeral: true
-                    });
-                    collector.stop();
-                    return;
-                } else {
-                    await i.followUp({
-                        content: `**Are you sure you want to delete the URL source with ID ${blobId}?**`,
-                        components: [helperButtons],
-                        ephemeral: true
-                    });
-                }
-
+            if (!blob) {
+                return await interaction.editReply({
+                    content: `File with ID ${blobId} does not exist.`,
+                    components: [],
+                });
             }
 
-            pageCount.setLabel(`${index + 1}/${pages.length}`);
-            previousBtn.setDisabled(index === 0);
-            nextBtn.setDisabled(index === pages.length - 1);
+            const isOwner = blob.userId === i.user.id;
+            const isAdmin = interaction.member.roles.cache.has(ADMIN_ROLE_ID);
 
-            await msg.edit({ embeds: [pages[index]], components: [buttons, components[index]] }).catch(err => { console.error(err) })
+            if (!isOwner && !isAdmin) {
+                return await i.followUp({
+                    content: "You do not have permission to delete this file. If you're a member you can only delete your own files :)",
+                    ephemeral: true,
+                });
+            }
 
-            collector.resetTimer();
+            await Blob.destroy({ where: { id: blobId } });
 
+            pages.splice(index, 1);
+            components.splice(index, 1);
+
+            if (pages.length === 0) {
+                return interaction.editReply({
+                    content: `All files have been removed.`,
+                    embeds: [],
+                    components: [],
+                });
+            }
+
+            if (index >= pages.length) index = pages.length - 1;
+
+            return interaction.editReply({
+                content: `File with **ID ${blobId}** has been deleted successfully.`,
+                embeds: [pages[index]],
+                components: [createNavigationButtons(index), components[index]],
+            });
+        }
+
+        if (i.customId.startsWith("cancel_remove_")) {
+            return interaction.editReply({
+                content: "Deletion canceled.",
+                embeds: [pages[index]],
+                components: [createNavigationButtons(index), components[index]],
+            });
+        }
+
+        const newButtons = createNavigationButtons(index);
+        await msg.edit({
+            embeds: [pages[index]],
+            components: [newButtons, components[index]],
         });
+        collector.resetTimer();
+    });
 
-        collector.on("end", async () => {
-            await msg.edit({ embeds: [pages[index]], components: [] }).catch(err => { console.error(err) })
-        })
-
-        return msg;
-
-
-    } catch (err) {
-
-        console.log(' Component error', err)
-    }
+    collector.on("end", async () => {
+        try {
+            await msg.edit({ components: [] }).catch(() => { });
+        } catch (error) {
+            console.error("Error clearing components:", error);
+        }
+    });
 }
 
