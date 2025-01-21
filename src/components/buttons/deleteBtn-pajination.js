@@ -1,13 +1,13 @@
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js')
 const Blob = require('../../models/Blob');
-const { admin } = require('../../../config.json');
+const { adminId } = require('../../../config.json');
 module.exports = async (interaction, pages, components, initPage = 0, time = 60 * 1000) => {
 
 
     if (!interaction || !pages || pages.length === 0)
         throw new Error("[PAGINATION] Invalid arguments");
 
-    const ADMIN_ROLE_ID = admin; 
+    const ADMIN_ROLE_ID = adminId; 
 
     let index = initPage;
 
@@ -63,7 +63,7 @@ module.exports = async (interaction, pages, components, initPage = 0, time = 60 
 
             if (!blob) {
                 return await interaction.editReply({
-                    content: `File with ID ${blobId} does not exist.`,
+                    content: `File with **ID ${blobId}** does not exist.`,
                     components: [],
                 });
             }
@@ -90,7 +90,7 @@ module.exports = async (interaction, pages, components, initPage = 0, time = 60 
             );
 
             return await interaction.editReply({
-                content: `Are you sure you want to delete the file with ID ${blobId}?`,
+                content: `Are you sure you want to delete the file with **ID ${blobId}**?`,
                 components: [confirmButtons],
             });
         }
@@ -101,7 +101,7 @@ module.exports = async (interaction, pages, components, initPage = 0, time = 60 
 
             if (!blob) {
                 return await interaction.editReply({
-                    content: `File with ID ${blobId} does not exist.`,
+                    content: `File with **ID ${blobId}** does not exist.`,
                     components: [],
                 });
             }
@@ -140,7 +140,7 @@ module.exports = async (interaction, pages, components, initPage = 0, time = 60 
 
         if (i.customId.startsWith("cancel_remove_")) {
             return interaction.editReply({
-                content: "Deletion canceled.",
+                content: `**Deletion canceled.**`,
                 embeds: [pages[index]],
                 components: [createNavigationButtons(index), components[index]],
             });
