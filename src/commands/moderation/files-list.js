@@ -4,6 +4,7 @@ const {
   } = require('discord.js');
   
   const Blob = require('../../models/Blob'); 
+  const { hasRole} = require('../../functions/general/hasRole')
 
   const  pagination = require('../../components/buttons/deleteBtn-pajination')
   module.exports = {
@@ -30,81 +31,74 @@ const {
   
     callback: async (client, interaction) => {
      
+      if(!hasRole(interaction)) return;
+      
+      await interaction.deferReply({ ephemeral: false });
+
       const page = interaction.options.getNumber('page') || 1;
-      const user =  interaction.options.get('user').value
+      const user = interaction.options.get("user")?.value;
   
       try {
 
-        let blobs;
-
-        if(!user){
-          blobs = await Blob.findAll({
-            where: { guildId: interaction.guild.id },
-            order: [['id', 'DESC']],
-          });
-        }else{
-          blobs = await Blob.findAll({
-            where: { guildId: interaction.guild.id ,userId:user },
-            order: [['id', 'DESC']],
-          });
-        }
+        const blobs = await Blob.findAll({
+          where: user
+            ? { guildId: interaction.guild.id, userId: user }
+            : { guildId: interaction.guild.id },
+          order: [["id", "DESC"]],
+        });
+  
        
         if (blobs.length === 0) {
-          return interaction.reply(`It seems like there's nothing stored.`);
+          return interaction.editReply(`It seems like there's nothing stored.`);
         }
      
-        let embeds = [];
-        let components = [];
-
-        blobs.forEach((blob, index) => {
-        const embed = new EmbedBuilder()
-          .setColor(Math.floor(Math.random() * 16777214) + 1)
-          .setTitle(`-------- List of saved files --------`)
-          .setAuthor({ name: `Page ${index +1} `})
-          .addFields(
-            { name: 'File name:', 
-                value: blob.name, 
-                inline: true },
-            {
-                name: 'Created at: ', 
-                value: blob.createdAt.toISOString().split('T')[0], 
-                inline: true 
-            })
+        const embeds = blobs.map((blob, index) => {
+          return new EmbedBuilder()
+            .setColor(Math.floor(Math.random() * 16777214) + 1)
+            .setTitle(`-------- List of saved files --------`)
+            .setAuthor({ name: `Page ${index + 1}` })
             .addFields(
-            {
-              name: 'Added by: ', 
-              value: `<@${blob.userId}>`, 
-              inline: false
-          },
-          {
-            name: 'Id: ', 
-            value: `${blob.id}`, 
-            inline: true
-        })
-          .setImage(blob.url)
-          .setTimestamp()
-          .setFooter({ text: 'Streaks', iconURL: 'https://static.wikia.nocookie.net/projectsekai/images/f/f6/Hatsune_Miku_-_25-ji%2C_Nightcord_de._April_Fools_Chibi.png/revision/latest?cb=20230922025244' });
-
+              { name: "File name:", value: blob.name, inline: true },
+              {
+                name: "Created at: ",
+                value: blob.createdAt.toISOString().split("T")[0],
+                inline: true,
+              },
+              {
+                name: "Added by: ",
+                value: `<@${blob.userId}>`,
+                inline: false,
+              },
+              { name: "Id: ", value: `${blob.id}`, inline: true }
+            )
+            .setImage(blob.url)
+            .setTimestamp()
+            .setFooter({
+              text: "Preview",
+              iconURL:
+                "https://static.wikia.nocookie.net/projectsekai/images/f/f6/Hatsune_Miku_-_25-ji%2C_Nightcord_de._April_Fools_Chibi.png/revision/latest?cb=20230922025244",
+            });
+        });
+  
+        const components = blobs.map((blob) => {
           const removeButton = new ButtonBuilder()
-          .setCustomId(`remove_${blob.id}`)  
-          .setLabel('Remove')
-          .setStyle(ButtonStyle.Danger);
-          console.log(blob.id)
-
-        const row = new ActionRowBuilder().addComponents(removeButton);
-        components.push(row)
-        embeds.push(embed)      
-      })
+            .setCustomId(`remove_${blob.id}`)
+            .setLabel("Remove")
+            .setStyle(ButtonStyle.Danger);
+  
+          return new ActionRowBuilder().addComponents(removeButton);
+        });
       
 
       const currentPage = page > embeds.length ? embeds.length : page;
+
 
         await pagination(interaction,embeds,components, currentPage - 1)
   
   
       } catch (error) {
         console.error(' Error fetching streaks:', error);
-        interaction.reply('An error occurred while fetching streaks.');
+        interaction.editReply('An error occurred while fetching streaks.');
       }
     },
   };

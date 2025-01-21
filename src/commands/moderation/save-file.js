@@ -4,6 +4,7 @@ const {
   } = require('discord.js');
   
   const Blob = require('../../models/Blob'); 
+  const { hasRole} = require('../../functions/general/hasRole')
 
   module.exports = {
     name: 'save-files',
@@ -46,6 +47,10 @@ const {
   
     callback: async (client, interaction) => {
    
+      if(!hasRole(interaction)) return;
+
+      await interaction.deferReply({ ephemeral: false });
+
       const urlString = interaction.options.getString('url') ;
       const fileName = interaction.options.getString('name') || 'Unnamed File';
       const context = interaction.options.getString('context') || 'hiyori';
@@ -58,7 +63,7 @@ const {
   
         const isValidUrl = urlString.match(/\.(jpeg|jpg|png|webp|gif|apng)$/i);
         if (!isValidUrl) {
-          return interaction.reply({
+          return interaction.editReply({
             content:'Invalid file URL. Please provide a valid image or GIF URL ending in .gif | .jpeg | .png like: \n ```https://example.com/mikugif.gif```',
             ephemeral:true});
         }
@@ -66,8 +71,8 @@ const {
         
         const existingFile = await Blob.findOne({ where: { url: urlString } });
       if (existingFile) {
-        return interaction.reply({
-          content:'This file URL is already saved in the database.', 
+        return interaction.editReply({
+          content:'This file URL has been already saved in the database.', 
           ephemeral:true});
       }
 
@@ -82,8 +87,8 @@ const {
           });
 
           console.log(newFile.toJSON());
-          interaction.reply({
-            content: `**The file has been added to the database!** \n ${urlString}`,
+          interaction.editReply({
+            content: `**The file URL has been added to the database!** \n ${urlString}`,
             ephemeral: false,
           });
 
@@ -91,7 +96,7 @@ const {
   
       } catch (error) {
         console.error('Error saving file:', error);
-        interaction.reply({content:'An error occurred while saving files.',   ephemeral: true});
+        interaction.editReply({content:'An error occurred while saving files.',   ephemeral: true});
       }
     },
   };
