@@ -1,16 +1,18 @@
 const { Client, Message } = require('discord.js');
 require('dotenv').config();
-
+const { getConfig } = require('../../functions/config/getConfig')
 /**
  *
  * @param {Client} client
  * @param {Message} message
  */
 
-module.exports = (client, message) => {
+module.exports = async (client, message) => {
 
     try {
-        const allowedChannelId = process.env.CHANNEL_ID;
+        const config = await  getConfig(message.guild.id,'emoji-counter')
+        if (!config || config.isActive ===false) return;
+        const allowedChannelId = config.channelId;
         const channel = client.channels.cache.get(allowedChannelId);
 
         if (!channel || message.channel.id !== allowedChannelId || message.author.bot) return;
@@ -31,6 +33,8 @@ module.exports = (client, message) => {
         const userMention = `<@${message.author.id}>`;
         let = resultMessage = ''
         let = resultEmoji = ''
+        const maxMessageLength = 1900;
+
         for (const [emoji, count] of Object.entries(emojiCounts)) {
             const emojiId = emoji.match(/:\d+/)[0].slice(1);
 
@@ -42,8 +46,15 @@ module.exports = (client, message) => {
                 const emojiName = emoji.match(/:\w+:/)[0].slice(1, -1);
                 resultMessage += `${userMention} has spammed *${emojiName}* **${count}** times\n`;
             }
+
+            if (resultMessage.length >= maxMessageLength) {
+                channel.send(resultMessage.trim());
+                resultMessage = ''; 
+            }
         }
-        channel.send(resultMessage);
+        if (resultMessage.length > 0) {
+            channel.send(resultMessage.trim());
+        }
 
     } catch (err) {
 

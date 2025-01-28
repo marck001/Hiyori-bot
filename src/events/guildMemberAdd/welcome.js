@@ -87,7 +87,7 @@ module.exports = async (client, member) => {
             console.error("Channel not found:", jsonData.channel);
             return;
         }
-        const message = `Hi hello ${emojisArray[0]} welcome to our server. Glad to see new people joining us <@${member.id}> #${member.guild.memberCount}. We are ⚔ Secret Base ⚔ ${emojisArray[1]} . 
+        const message = `Hi hello ${emojisArray[0]} welcome to our server. Glad to see new people joining us <@${member.id}> #${member.guild.memberCount}. We are ${member.guild.name} ${emojisArray[1]} . 
               
             We are hoping to know you better. Hope you like been here. Thank you <:ElivThankYou:1295009702530515005>
             
