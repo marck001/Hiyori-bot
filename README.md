@@ -14,8 +14,8 @@ Follow these steps to get the bot up and running:
 ### 1. Clone the Repository
 Clone this repository to your local machine:
    ```bash
-   git clone https://github.com/marck001/Server-discord-bot.git
-   cd server-discord-bot
+   https://github.com/marck001/Hiyori-bot.git
+   cd Hiyori-bot
    ```
 
 ### 2. Install Dependencies
