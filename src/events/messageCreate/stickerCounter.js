@@ -1,94 +1,93 @@
 const { Client, Message } = require('discord.js');
 require('dotenv').config();
-
+const { getConfig } = require('../../functions/config/getConfig');
 const Counter = require('../../models/Counter');
-let lastStickerId = null;
-let streakCount = 0;
-let lastStickerName = '';
-require('dotenv').config();
-const { getRandomUlr } = require('../../functions/blob/getRandomUrl');
 const streakRecordCanva = require('../../components/canvas/streakRecord');
-let highestStreak = null;
+const { getRandomUrl} = require('../../functions/blob/getRandomUrl')
 
-
-
+const streakData = new Map(); 
 /**
  *
  * @param {Client} client
  * @param {Message} message
  */
-
 async function updateHighestStreak(guildId) {
-    if (!highestStreak) {
-        const counter = await Counter.findOne({
-            where: { guildId },
-            order: [['streak', 'DESC']],
-        });
-        highestStreak = counter ? counter.streak : 0;
-    }
+    const counter = await Counter.findOne({
+        where: { guildId },
+        order: [['streak', 'DESC']],
+    });
+    return counter ? counter.streak : 0;
 }
 
-
 module.exports = async (client, message) => {
-
-
     try {
-        const channel = client.channels.cache.get(process.env.CHANNEL_ID);
+        if (!message.stickers.size || message.author.bot) return;
 
+        const config = await getConfig(message.guild.id, 'sticker-counter');
+        if (!config || !config.isActive) return;
 
-        //const streakChannel = client.channels.cache.get(process.env.STREAK_ID);
+        const channel = client.channels.cache.get(config.channelId);
+        if (!channel || message.channel.id !== config.channelId) return;
 
-        if (!message.stickers.size || !channel || message.channel.id !== process.env.CHANNEL_ID) return;
+        if (!streakData.has(message.guild.id)) {
+            streakData.set(message.guild.id, {
+                lastStickerId: null,
+                lastStickerName: '',
+                lastSticker: null,
+                streakCount: 0,
+                highestStreak: await updateHighestStreak(message.guild.id),
+            });
+        }
 
+        const serverStreak = streakData.get(message.guild.id);
         const sticker = message.stickers.first();
         const stickerId = sticker.id;
         const stickerName = sticker.name;
-        if (stickerId === lastStickerId) {
-            streakCount++;
+
+        if (stickerId === serverStreak.lastStickerId) {
+            serverStreak.streakCount++;
             switch (true) {
-                case (streakCount % 1000 === 0):
-                    channel.send(`Incredible! **${stickerName}** has reached a streak of **${streakCount}**! <:hiyoriHeart:1280172714283237406>`);
-                    channel.send('https://cdn.discordapp.com/emojis/1181355299618177035.gif')
+                case (serverStreak.streakCount % 1000 === 0):
+                    channel.send(`Incredible! **${stickerName}** has reached a streak of **${serverStreak.streakCount}**!`);
+                    channel.send('https://cdn.discordapp.com/emojis/1181355299618177035.gif');
                     break;
-                case (streakCount % 100 === 0):
-                    channel.send(`Wow, **${stickerName}** has a streak of **${streakCount}**! <:hiyoriHeart:1280172714283237406>`);
-                    channel.send(await getRandomUlr() || 'No files stored :(')
+                case (serverStreak.streakCount % 10 === 0):
+                    channel.send(`Wow, **${stickerName}** has a streak of **${serverStreak.streakCount}**!`);
+                    channel.send(await getRandomUrl() || 'No files stored :(');
                     break;
-                case (streakCount % 5 === 0):
-                    channel.send(`**${stickerName}** has a streak of **${streakCount}**!`);
+                case (serverStreak.streakCount % 5 === 0):
+                    channel.send(`**${stickerName}** has a streak of **${serverStreak.streakCount}**!`);
+                    channel.send(await getRandomUrl() || 'No files stored :(');
                     break;
             }
+            console.log("server count ",serverStreak.streakCount)
         } else {
-            if (streakCount >= 1) {
+            if (serverStreak.streakCount >= 5) {
                 console.log(`Streak was broken`);
                 const userMention = `<@${message.author.id}>`;
-                channel.send(`${userMention} broke the **${lastStickerName}** streak of ${streakCount}!`);
+                channel.send(`${userMention} broke the **${serverStreak.lastStickerName}** streak of ${serverStreak.streakCount}!`);
 
-                await updateHighestStreak(message.guild.id);
-
-                if (streakCount > 0) {
-                    const newCounter = await Counter.create({
+                if (serverStreak.streakCount > serverStreak.highestStreak) {
+                    await Counter.create({
                         userId: message.author.id,
                         guildId: message.guild.id,
-                        stickerName: lastStickerName,
-                        streak: streakCount,
+                        stickerName: serverStreak.lastStickerName,
+                        streak: serverStreak.streakCount,
                         date: new Date(),
                     });
-                    await streakRecordCanva(streakCount, sticker, highestStreak, message.author,channel)
 
-                    highestStreak = streakCount;
-                    console.log(newCounter.toJSON());
+                    serverStreak.highestStreak = serverStreak.streakCount;
+                    const recordChannel = await getConfig(message.guild.id, 'streak-record') || channel;
+                    await streakRecordCanva(serverStreak.streakCount, serverStreak.lastSticker, serverStreak.highestStreak, message.author, recordChannel);
                 }
             }
-            streakCount = 1;
-            lastStickerId = stickerId;
-            lastStickerName = stickerName;
+            serverStreak.streakCount = 1;
+            serverStreak.lastStickerId = stickerId;
+            serverStreak.lastStickerName = stickerName;
+            serverStreak.lastSticker = sticker;
+            console.log(serverStreak.lastSticker)
         }
-        console.log(streakCount)
     } catch (err) {
-        console.log("There was an error: ", err)
+        console.log("There was an error: ", err);
     }
-
-
-
 };
