@@ -1,27 +1,32 @@
 const { EmbedBuilder } = require('discord.js');
-
+const Config = require('../../models/Config');
 module.exports = {
-    name: 'config info',
+    name: `config-info`,
     description: 'Information about configuration status',
     devOnly: true,
   
     callback: async (client, interaction) => {
       await interaction.deferReply();
 
+      const configs = await Config.findAll(  {where:{guildId:interaction.guild.id}})
+
+      if(!configs) return interaction.editReply('No config set yet');
       const embed = new EmbedBuilder()
       .setColor(0x0099FF)
-      .setTitle('----- List of commands -----')
+      .setTitle('----- Channels set -----')
       .setDescription('Your server config')
-      .addFields(
-        {name: 'streaks stats', value:'`/streak-stats`'},
-      )
-      .addFields(
-        {name: 'pats an user', value:'`/pat-user`'},
-        {name: 'pats the bot', value:'`/pat-me`'},
-        {name: 'checks bot current server ping', value:'`/ping`'}
-      )
       .setTimestamp()
-      .setFooter({ text: 'commands', iconURL: 'https://static.wikia.nocookie.net/projectsekai/images/f/f6/Hatsune_Miku_-_25-ji%2C_Nightcord_de._April_Fools_Chibi.png/revision/latest?cb=20230922025244' });
+      .setFooter({ text: 'config', iconURL: 'https://static.wikia.nocookie.net/projectsekai/images/f/f6/Hatsune_Miku_-_25-ji%2C_Nightcord_de._April_Fools_Chibi.png/revision/latest?cb=20230922025244' });
+      configs.forEach((config, i) => { 
+        const index =  i + 1;
+        const active = config.isActive ? 'active' : 'inactive';
+        embed.addFields({
+          name: `${index}. Config: ${config.channelType}`,
+          value: `${config.channelType} set in <#${config.channelId}>\n State: ${active} `,
+          inline: false
+        });
+      });
+     
   
       interaction.editReply({embeds: [embed]});
     },
