@@ -9,13 +9,15 @@ const filePath = path.join(__dirname, '../../../data/welcome.json');
 const jsonData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
 GlobalFonts.registerFromPath(path.join(__dirname, '../../../data/fonts/impact.ttf'), 'Impact');
 GlobalFonts.registerFromPath(path.join(__dirname, '../../../data/fonts/arial.ttf'), 'Arial');
-
+const { getConfig } = require('../../functions/config/getConfig');
 
 module.exports = async (client, member) => {
 
 
-
     if (!member.guild) return;
+    const config = await  getConfig(member.guild.id,'welcome')
+    if (!config || config.isActive ===false) return;
+    const allowedChannelId = config.channelId;
 
     try {
         const canvas = Canvas.createCanvas(1000, 630);
@@ -81,10 +83,10 @@ module.exports = async (client, member) => {
         const attachment = new AttachmentBuilder(await canvas.encode('png'), { name: 'welcome-image.png' });
 
         const channel = member.guild.channels.cache.find(
-            (ch) => ch.id === jsonData.channel
+            (ch) => ch.id === allowedChannelId 
         );
         if (!channel) {
-            console.error("Channel not found:", jsonData.channel);
+            console.error("Channel not found:", allowedChannelId );
             return;
         }
         const message = `Hi hello ${emojisArray[0]} welcome to our server. Glad to see new people joining us <@${member.id}> #${member.guild.memberCount}. We are ${member.guild.name} ${emojisArray[1]} . 
