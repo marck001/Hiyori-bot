@@ -4,42 +4,95 @@ const {
     ApplicationCommandOptionType,
     PermissionFlagsBits, ChannelType,
 } = require('discord.js');
+const { getConfig } = require('../../functions/config/getConfig')
+const Config = require('../../models/Config');
 
 module.exports = {
 
     name: 'toggle',
-    description: 'mysterious command',
+    description: 'Enable or disable functions',
+    options: [
+        {
+            name: 'config',
+            description: 'function to perform action',
+            required: true,
+            type: ApplicationCommandOptionType.String,
+            autocomplete: true,
+            /*    choices:[
+                {
+                   name: 'evil-playlist',
+                   value: 'evil-playlist'
+               },
+               {
+                 name: 'neuro-playlist',
+                 value: 'neuro-playlist'
+             },
+             {
+               name: 'tutel',
+               value: 'tutel'
+           },
+               ]*/
+        },
+    ],
     permissionsRequired: [PermissionFlagsBits.Administrator],
     botPermissions: [PermissionFlagsBits.Administrator],
     devOnly: true,
-    deleted: true,
+    deleted: false,
+    autocomplete: true,
 
     callback: async (client, interaction) => {
 
+        const channelType = interaction.options.getString('config');
+        const guildId = interaction.guild.id;
         try {
-  
-            interaction.client.deleteMessages = !interaction.client.deleteMessages;
-
-          await  interaction.reply({ content: `Message deletion is now ${interaction.client.deleteMessages ? 'enabled' : 'disabled'}.`, ephemeral: true });
+            await interaction.deferReply({ ephemeral: false });
 
 
-            const targetUser = await client.users.fetch(process.env.BOT_XD);
+            const config = await getConfig(guildId, channelType)
+            const active = !config.isActive;
+
+            await config.update({ isActive: active });
+
+            await interaction.editReply({ content: `**${channelType}** is now ${active ? 'enabled' : 'disabled'}.`, ephemeral: true });
 
 
-        if( interaction.client.deleteMessages){
 
-            targetUser.send(`I'm in control over you now <a:hiyori:1278430751419011213>`);
-        }
-       
-       
-      
-
-
-        }catch(err){
+        } catch (err) {
             console.error('Error :', err);
-           // interaction.reply('Error while toggling XD.');
         }
 
 
     },
-};
+
+    async autocomplete(interaction) {
+        const focusedValue = interaction.options.getFocused();
+        const guildId = interaction.guild.id;
+
+        try {
+
+
+            const configs = await Config.findAll({ where: { guildId: guildId } });
+            console.log("working")
+
+            const filteredConfigs = configs
+                .filter(config => config.channelType && config.channelType.toLowerCase().startsWith(focusedValue.toLowerCase()));
+
+
+            if (!filteredConfigs.length) {
+                await interaction.respond([{ name: 'No config found', value: 'none' }]);
+                return;
+            }
+
+            await interaction.respond(
+                filteredConfigs.map(config => ({
+                    name: `${config.channelType}-${config.isActive ? 'enabled' : 'disabled'}`,
+                    value: config.channelType,
+                }))
+            );
+        } catch (err) {
+            console.error('Error in autocomplete:', err);
+            await interaction.respond([{ name: 'Error loading config', value: 'error' }]);
+        }
+    }
+
+}
