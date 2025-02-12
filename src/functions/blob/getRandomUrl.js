@@ -2,9 +2,9 @@
 const Blob = require('../../models/Blob');
 const sequelize = require('../../db/sequelize');
 
-async function getRandomUlr() {
+async function getRandomUrl(guildId) {
     try {
-        const blob = await Blob.findOne({ order: sequelize.random() })
+        const blob = await Blob.findOne({ order: sequelize.random() ,where: {guildId:guildId}})
 
         const blobUrl = blob.url;
         if (!blob) {
@@ -21,4 +21,4 @@ async function getRandomUlr() {
 
 }
 
-module.exports = { getRandomUlr };
+module.exports = { getRandomUrl };

@@ -3,7 +3,7 @@ require('dotenv').config();
 const { getConfig } = require('../../functions/config/getConfig');
 const Counter = require('../../models/Counter');
 const streakRecordCanva = require('../../components/canvas/streakRecord');
-const { getRandomUrl} = require('../../functions/blob/getRandomUrl')
+const { getRandomUrl } = require('../../functions/blob/getRandomUrl')
 
 const streakData = new Map(); 
 /**
@@ -43,6 +43,7 @@ module.exports = async (client, message) => {
         const sticker = message.stickers.first();
         const stickerId = sticker.id;
         const stickerName = sticker.name;
+        const guildId = message.guild.id;
 
         if (stickerId === serverStreak.lastStickerId) {
             serverStreak.streakCount++;
@@ -53,11 +54,11 @@ module.exports = async (client, message) => {
                     break;
                 case (serverStreak.streakCount % 10 === 0):
                     channel.send(`Wow, **${stickerName}** has a streak of **${serverStreak.streakCount}**!`);
-                    channel.send(await getRandomUrl() || 'No files stored :(');
+                    channel.send(await getRandomUrl(guildId) || 'No files stored :(');
                     break;
                 case (serverStreak.streakCount % 5 === 0):
                     channel.send(`**${stickerName}** has a streak of **${serverStreak.streakCount}**!`);
-                    channel.send(await getRandomUrl() || 'No files stored :(');
+                    channel.send(await getRandomUrl(guildId) || 'No files stored :(');
                     break;
             }
             console.log("server count ",serverStreak.streakCount)
@@ -77,7 +78,8 @@ module.exports = async (client, message) => {
                     });
 
                     serverStreak.highestStreak = serverStreak.streakCount;
-                    const recordChannel = await getConfig(message.guild.id, 'streak-record') || channel;
+                    const recordConfig = await getConfig(message.guild.id, 'streak-record') || channel;
+                    const recordChannel = (!config || !config.isActive)? client.channels.cache.get(recordConfig.channelId) : channel;
                     await streakRecordCanva(serverStreak.streakCount, serverStreak.lastSticker, serverStreak.highestStreak, message.author, recordChannel);
                 }
             }
@@ -85,7 +87,6 @@ module.exports = async (client, message) => {
             serverStreak.lastStickerId = stickerId;
             serverStreak.lastStickerName = stickerName;
             serverStreak.lastSticker = sticker;
-            console.log(serverStreak.lastSticker)
         }
     } catch (err) {
         console.log("There was an error: ", err);
