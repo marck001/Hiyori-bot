@@ -13,13 +13,13 @@ module.exports = {
       if(!configs) return interaction.editReply('No config set yet');
       const embed = new EmbedBuilder()
       .setColor(0x0099FF)
-      .setTitle('----- Channels set -----')
+      .setTitle('----- Channels settings -----')
       .setDescription('Your server config')
       .setTimestamp()
       .setFooter({ text: 'config', iconURL: 'https://static.wikia.nocookie.net/projectsekai/images/f/f6/Hatsune_Miku_-_25-ji%2C_Nightcord_de._April_Fools_Chibi.png/revision/latest?cb=20230922025244' });
       configs.forEach((config, i) => { 
         const index =  i + 1;
-        const active = config.isActive ? 'active' : 'inactive';
+        const active = config.isActive ? '🟢 Enabled' : '🔴 Disabled';
         embed.addFields({
           name: `${index}. Config: ${config.channelType}`,
           value: `${config.channelType} set in <#${config.channelId}>\n State: ${active} `,

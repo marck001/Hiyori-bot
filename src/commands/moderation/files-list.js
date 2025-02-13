@@ -25,9 +25,7 @@ const {
       },
     ],
     deleted: false,
-    permissionsRequired: [PermissionFlagsBits.Administrator],
-    botPermissions: [PermissionFlagsBits.Administrator],
-    devOnly: true,
+    devOnly: false,
   
     callback: async (client, interaction) => {
      
@@ -49,7 +47,7 @@ const {
   
        
         if (blobs.length === 0) {
-          return interaction.editReply(`It seems like there's nothing stored.`);
+          return interaction.editReply(`It appears that there's nothing stored.`);
         }
      
         const embeds = blobs.map((blob, index) => {
@@ -65,7 +63,7 @@ const {
                 inline: true,
               },
               {
-                name: "Added by: ",
+                name: "Uploaded by: ",
                 value: `<@${blob.userId}>`,
                 inline: false,
               },

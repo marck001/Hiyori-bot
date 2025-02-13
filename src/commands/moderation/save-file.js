@@ -40,9 +40,7 @@ const {
       },
     ],
     deleted: false,
-    permissionsRequired: [PermissionFlagsBits.Administrator],
-    botPermissions: [PermissionFlagsBits.Administrator],
-    devOnly: true,
+    devOnly: false,
    
   
     callback: async (client, interaction) => {
