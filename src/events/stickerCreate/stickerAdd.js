@@ -1,5 +1,5 @@
 const { request } = require('undici');
-
+const { getConfig } = require('../../functions/config/getConfig');
 module.exports = async (client, newSticker) => {
 
     try {
@@ -9,6 +9,13 @@ module.exports = async (client, newSticker) => {
             console.error("No guild associated with this sticker.");
             return;
         }
+        const config = await  getConfig(newSticker.guild.id,'emote-library')
+        if (!config || config.isActive ===false) return;
+        const allowedChannelId = config.channelId;
+
+        const channel = client.channels.cache.get(allowedChannelId);
+
+        if (!channel || newEmoji.channel.id !== allowedChannelId ) return;
 
         const isAnimated = newSticker.format === 2 || newSticker.format === 4;
 
@@ -21,7 +28,6 @@ module.exports = async (client, newSticker) => {
         const imageBuffer = await body.arrayBuffer();
 
 
-        const channel = newSticker.guild.channels.cache.get('1277232456201670708');
        
         if (!channel) {
             console.error("Channel not found!");

@@ -1,18 +1,24 @@
 const { request } = require('undici');
-
+const { getConfig } = require('../../functions/config/getConfig');
 module.exports = async (client, newEmoji) => {
 
    
 
     try {
 
-       
-
-
         if (!newEmoji.guild) {
             console.error("No guild associated with this emoji.");
             return;
         }
+
+        const config = await  getConfig(newEmoji.guild.id,'emote-library')
+        if (!config || config.isActive ===false) return;
+        const allowedChannelId = config.channelId;
+
+        const channel = client.channels.cache.get(allowedChannelId);
+
+        if (!channel || newEmoji.channel.id !== allowedChannelId ) return;
+
 
         const emojiURL = newEmoji.animated
             ? `https://cdn.discordapp.com/emojis/${newEmoji.id}.gif`
@@ -23,7 +29,6 @@ module.exports = async (client, newEmoji) => {
         const imageBuffer = await body.arrayBuffer();
 
 
-        const channel = newEmoji.guild.channels.cache.get('1307350353863250051');
        
         if (!channel) {
             console.error("Channel not found!");
