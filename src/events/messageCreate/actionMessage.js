@@ -19,7 +19,7 @@ module.exports = async (client, message) => {
         if (!channel || message.channel.id !== allowedChannelId || message.author.bot) return;
 
 
-        const messageChance = 1;
+        const messageChance = 0.1;
         const randomNum = Math.random();
         console.log("response chance " + randomNum)
 
@@ -91,7 +91,7 @@ module.exports = async (client, message) => {
         }
 
 
-        const reactionChance = 0.5;
+        const reactionChance = 0.8;
         const randomValue = Math.random();
         console.log("response type " + randomValue)
 

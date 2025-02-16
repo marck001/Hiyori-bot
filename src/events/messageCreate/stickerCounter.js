@@ -54,11 +54,11 @@ module.exports = async (client, message) => {
                     break;
                 case (serverStreak.streakCount % 10 === 0):
                     channel.send(`Wow, **${stickerName}** has a streak of **${serverStreak.streakCount}**!`);
-                    channel.send(await getRandomUrl(guildId) || 'No files stored :(');
+                    channel.send(await getRandomUrl(guildId) || 'https://cdn.discordapp.com/emojis/1181355299618177035.gif');
                     break;
                 case (serverStreak.streakCount % 5 === 0):
                     channel.send(`**${stickerName}** has a streak of **${serverStreak.streakCount}**!`);
-                    channel.send(await getRandomUrl(guildId) || 'No files stored :(');
+                    channel.send(await getRandomUrl(guildId) || 'https://cdn.discordapp.com/emojis/1181355299618177035.gif');
                     break;
             }
             console.log("server count ",serverStreak.streakCount)
@@ -79,8 +79,8 @@ module.exports = async (client, message) => {
 
                     serverStreak.highestStreak = serverStreak.streakCount;
                     const recordConfig = await getConfig(message.guild.id, 'streak-record') || channel;
-                    const recordChannel = (!config || !config.isActive)? client.channels.cache.get(recordConfig.channelId) : channel;
-                    await streakRecordCanva(serverStreak.streakCount, serverStreak.lastSticker, serverStreak.highestStreak, message.author, recordChannel);
+                    const recordChannel = (config || config.isActive)? client.channels.cache.get(recordConfig.channelId) : channel;
+                    await streakRecordCanva(serverStreak.streakCount, serverStreak.lastSticker, serverStreak.highestStreak - serverStreak.streakCount, message.author, recordChannel);
                 }
             }
             serverStreak.streakCount = 1;
