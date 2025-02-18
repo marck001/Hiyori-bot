@@ -21,12 +21,12 @@ async function setChannel(i, guildId, channelId, channelType, isActive) {
 
                 await config.update({ channelId, isActive });
                 return i.editReply({
-                    content: `The channel for **${channelType}** has been updated from <#${oldChannelId}> to <#${channelId}> `,
                     ephemeral: false,
+                    content: `The channel for **${channelType}** has been updated from <#${oldChannelId}> to <#${channelId}> \n ** State: ** ${config.isActive ? 'active' : 'inactive'} `,
                 });
             } else {
                 return i.editReply({
-                    content: `That **${channelType}** function had been already set in  <#${oldChannelId}> previously `,
+                    content: `That **${channelType}** function had been already set in  <#${oldChannelId}> previously \n ** State: ** ${config.isActive ? 'active' : 'inactive'} `,
                     ephemeral: false,
                 });
             }
