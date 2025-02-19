@@ -34,6 +34,10 @@ module.exports = {
                     name:'emote-library',
                     value:'emote-library'
                 }
+                ,{
+                    name:'free-will',
+                    value:'free-will'
+                }
             ]
         },
         {

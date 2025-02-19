@@ -16,7 +16,7 @@ const Config = sequelize.define('Config', {
         allowNull: false,
     },
     channelType: {
-        type: DataTypes.ENUM('emoji-counter', 'sticker-counter', 'streak-record', 'welcome','emote-library'),
+        type: DataTypes.ENUM('emoji-counter', 'sticker-counter', 'streak-record', 'welcome','emote-library','free-will'),
         allowNull: false,
     },
     isActive: {
