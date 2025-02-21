@@ -94,7 +94,7 @@ module.exports = async (client, message) => {
             await message.react(emojiFormat);
         } else {
             message.channel.sendTyping();
-            const webhookClient = createWebHooK('https://discord.com/api/webhooks/1341094940352053368/Iv0piACGIJFLU3Puv5vbhOZRh7iidc_78BTSunq4aM2A4HaW38QL4jQpibawLOmtm-x5')
+            const webhookClient = createWebHooK(process.env.HIYORI_WEBHOOK)
             const replyMessage = await getResponse(`user:${message.author.displayName} message: ${message.content}`,client.tokenIndex);
             
             if(replyMessage){
