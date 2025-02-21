@@ -67,6 +67,8 @@ module.exports = {
         const channelType= interaction.options.getString('channel-type');
         const isActive = interaction.options.getBoolean('active')?.true;
 
+        if (!channelType) return interaction.reply({ content:"Channel type not selected",ephemeral:true})
+
 
         await interaction.deferReply({ ephemeral: false });
 
