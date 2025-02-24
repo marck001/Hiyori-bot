@@ -15,6 +15,47 @@ const jsonData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
  * @param {Message} message
  */
 
+function containsPing(content, pings) {
+    const wordsPatterns = pings.map(word => new RegExp(word.split('').join('[\\s-]*'), 'i'));
+    return wordsPatterns.some(pattern => pattern.test(content.toLowerCase()));
+}
+
+async function sendMessage(message, messageContent, tokenIndex) {
+    message.channel.sendTyping();
+    const channel = message.channel;
+    const webhookClient = createWebHooK(process.env.HIYORI_WEBHOOK)
+    const replyMessage = await getResponse(messageContent, tokenIndex);
+
+    if (replyMessage) {
+        await webhookClient.send(replyMessage);
+        console.log("Debug message: ", replyMessage)
+    }
+}
+
+function findRandomEmoji(content, emojis) {
+    const emojiRegex = /^<a?:\w+:\d+>$/;
+    const isSingleEmoji = emojiRegex.test(content);
+
+    let matchedEmojis;
+
+    if (isSingleEmoji) {
+        const emojiName = content.match(/:\w+:/)[0].slice(1, -1).toLowerCase();
+        matchedEmojis = emojis.filter(emoji => emoji.name.toLowerCase().includes(emojiName));
+    } else {
+        const words = content.toLowerCase().split(/\s+/);
+        matchedEmojis = emojis.filter(emoji => {
+            const emojiName = emoji.name.toLowerCase();
+            return words.some(word => emojiName.includes(word) || word.includes(emojiName));
+        });
+    }
+
+    const emojiArray = matchedEmojis.size > 0 ? Array.from(matchedEmojis.values()) : Array.from(emojis.values());
+    if (emojiArray.length === 0) return null;
+
+    const randomEmoji = emojiArray[Math.floor(Math.random() * emojiArray.length)];
+    return randomEmoji.animated ? `<a:${randomEmoji.name}:${randomEmoji.id}>` : `<:${randomEmoji.name}:${randomEmoji.id}>`;
+}
+
 module.exports = async (client, message) => {
 
     try {
@@ -29,94 +70,29 @@ module.exports = async (client, message) => {
         console.log("response chance " + randomNum)
 
         if (randomNum > messageChance) return;
+        const pings = ['<@1277282990782677034>', '@SpamEnjoyed.1984#4354', '@SpamEnjoyed'];
 
-        const guild = message.guild;
-        const emojis = guild.emojis.cache;
-
-        const words = message.content.split(/\s+/);
-        console.log("words ", words)
-
-        let emojiFormat;
-
-        const emojiRegex = /^<a?:\w+:\d+>$/;
-
-        if (emojiRegex.test(message.content)) {
-
-            const emojiName = message.content.match(/:\w+:/)[0].slice(1, -1);
-
-            const similarEmojis = emojis.filter(emoji => {
-                const serverEmojiName = emoji.name.toLowerCase();
-                const inputEmojiName = emojiName.toLowerCase();
-
-                return (
-                    serverEmojiName.includes(inputEmojiName) ||
-                    inputEmojiName.includes(serverEmojiName)
-                );
-            });
-
-            if (similarEmojis.size > 0) {
-                const emojiArray = Array.from(similarEmojis.values());
-                const randomEmoji = emojiArray[Math.floor(Math.random() * emojiArray.length)];
-                emojiFormat = randomEmoji.animated ? `<a:${randomEmoji.name}:${randomEmoji.id}>` : `<:${randomEmoji.name}:${randomEmoji.id}>`;
-            } else {
-                const emojiArray = Array.from(emojis.values());
-                if (emojiArray.length === 0) return ;
-                const randomEmoji = emojiArray[Math.floor(Math.random() * emojiArray.length)];
-                emojiFormat = randomEmoji.animated ? `<a:${randomEmoji.name}:${randomEmoji.id}>` : `<:${randomEmoji.name}:${randomEmoji.id}>`;
-            }
-        } else {
-            const words = message.content.toLowerCase().split(/\s+/);
-            const matchedEmojis = emojis.filter(emoji => {
-                const emojiName = emoji.name.toLowerCase();
-                return words.some(word => emojiName.includes(word) || word.includes(emojiName));
-            });
-
-            if (matchedEmojis.size > 0) {
-
-                const emojiArray = Array.from(matchedEmojis.values());
-                const randomEmoji = emojiArray[Math.floor(Math.random() * emojiArray.length)];
-                emojiFormat = randomEmoji.animated ? `<a:${randomEmoji.name}:${randomEmoji.id}>` : `<:${randomEmoji.name}:${randomEmoji.id}>`;
-            } else {
-
-                const emojiArray = Array.from(emojis.values());
-                if (emojiArray.length === 0) return ;
-            
-                const randomEmoji = emojiArray[Math.floor(Math.random() * emojiArray.length)];
-                emojiFormat = randomEmoji.animated ? `<a:${randomEmoji.name}:${randomEmoji.id}>` : `<:${randomEmoji.name}:${randomEmoji.id}>`;
-            }
+        if (containsPing(message.content, pings)) {
+          return await sendMessage(message, `user:${message.author.displayName} pinged you, message: ${message.content}`, client.tokenIndex)
         }
+
+        const emojiFormat = findRandomEmoji(message.content, message.guild.emojis.cache);
+        if (!emojiFormat) return;
+
         const reactionChance = 0;
         const randomValue = Math.random();
         console.log("response type " + randomValue)
 
         if (randomValue < reactionChance) {
-
             await message.react(emojiFormat);
         } else {
-            message.channel.sendTyping();
-            const webhookClient = createWebHooK(process.env.HIYORI_WEBHOOK)
-            const replyMessage = await getResponse(`user:${message.author.displayName} message: ${message.content}`,client.tokenIndex);
-            
-            if(replyMessage){
-                await webhookClient.send(replyMessage);
-                console.log("Debug message: ",replyMessage)
-            }
-
-            console.log(" inner token index ",client.tokenIndex)
+            await sendMessage(message, `user:${message.author.displayName} message: ${message.content}`, client.tokenIndex)
+            console.log(" inner token index ", client.tokenIndex)
 
         }
     } catch (err) {
-        client.tokenIndex = client.tokenIndex>jsonData.tokens.size ? 0 : client.tokenIndex +1;
-        const replyMessage = await getResponse(`user:${message.author.displayName} message: ${message.content} `,client.tokenIndex);
-            
-        if(replyMessage){
-            await webhookClient.send(replyMessage);
-            console.log("Debug message: ",replyMessage)
-        }
-        console.log("There was an error: ", err," token index ",client.tokenIndex)
+        client.tokenIndex = client.tokenIndex >= jsonData.tokens.size ? 0 : client.tokenIndex + 1;
+        await sendMessage(message, `user:${message.author.displayName} message: ${message.content} `, client.tokenIndex)
+        console.log("There was an error: ", err, " token index ", client.tokenIndex)
     }
-
-
-
-
 };
