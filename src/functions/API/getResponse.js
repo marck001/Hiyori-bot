@@ -6,7 +6,7 @@ const path = require('path');
 const filePath = path.join(__dirname, '../../../data/chatbot.json');
 const jsonData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
 
-async function getResponse(text,index) {
+async function getResponse(history,userMessage,index) {
     try {
         const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
           method: 'POST',
@@ -21,9 +21,11 @@ async function getResponse(text,index) {
                     role: 'system',
                     content:jsonData.system ,
                   },
+                ...history.filter((msg) => msg.role === 'user') 
+                  .map((msg) => ({ role: msg.role, content: msg.content })),
               {
                 role: 'user',
-                content: text,
+                content: userMessage,
               },
             ],
           }),
