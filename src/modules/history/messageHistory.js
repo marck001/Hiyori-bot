@@ -26,6 +26,19 @@ function loadData() {
 
 function addMessageToHistory(role, content, metadata) {
     const data = loadData();
+    const userMessages = data.messages.filter(
+        (msg) => msg.userId === metadata.userId && msg.channelId === metadata.channelId
+    );
+
+
+    if (userMessages.length >= 8) {
+        const oldestUserMessageIndex = data.messages.findIndex(
+            (msg) => msg.userId === metadata.userId && msg.channelId === metadata.channelId
+        );
+        if (oldestUserMessageIndex !== -1) {
+            data.messages.splice(oldestUserMessageIndex, 1); 
+        }
+    }
     data.messages.push({
         role,
         content,
@@ -34,18 +47,23 @@ function addMessageToHistory(role, content, metadata) {
     });
 
 
-    if (data.messages.length > 20) {
-        data.messages.splice(0, data.messages.length - 20); 
+    if (data.messages.length > 60) {
+        data.messages.splice(0, data.messages.length - 60); 
     }
 
     fs.writeFileSync(filePath, JSON.stringify(data, null, 2)); 
 }
 
+function getChannelHistory(history, channelId) {
+    return history
+        .filter((msg) => msg.channelId === channelId) 
+        .slice(-8); 
+}
 
 
 function getMessageHistory(channelId) {
     const data = loadData();
-    return data.messages.filter((message) => message.channelId === channelId);
+    return getChannelHistory(data.messages, channelId); 
 }
 
 module.exports = {getMessageHistory,addMessageToHistory }

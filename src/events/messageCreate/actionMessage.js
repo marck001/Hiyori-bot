@@ -7,6 +7,7 @@ const fs = require('fs');
 const path = require('path');
 const filePath = path.join(__dirname, '../../../data/chatbot.json');
 const jsonData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+const { getMessageHistory,addMessageToHistory} = require('../../modules/history/messageHistory')
 
 
 /**
@@ -20,11 +21,22 @@ function containsPing(content, pings) {
     return wordsPatterns.some(pattern => pattern.test(content.toLowerCase()));
 }
 
-async function sendMessage(message, messageContent, tokenIndex) {
-    message.channel.sendTyping();
+async function sendMessage(message, messageContent, isPing, tokenIndex) {
+  //  message.channel.sendTyping();
+    const metadata = {
+        userId: message.author.id,
+        username: message.author.displayName,
+        channelId: message.channel.id,
+        messageId: message.id,
+        isPing: isPing,
+    };
     const channel = message.channel;
+
+    addMessageToHistory('user', message.content, metadata);
+
+    const history = getMessageHistory(message.channel.id);
     const webhookClient = createWebHooK(process.env.HIYORI_WEBHOOK)
-    const replyMessage = await getResponse(messageContent, tokenIndex);
+    const replyMessage = await getResponse(history,messageContent, tokenIndex);
 
     if (replyMessage) {
         await webhookClient.send(replyMessage);
@@ -65,16 +77,18 @@ module.exports = async (client, message) => {
         const channel = client.channels.cache.get(allowedChannelId);
 
         if (!channel || message.channel.id !== allowedChannelId || message.author.bot || message.stickers.size) return;
+        const pings = ['<@1277282990782677034>', '@SpamEnjoyed.1984#4354', '@SpamEnjoyed'];
+
+        if (containsPing(message.content, pings)) {
+          await  message.react('<:ping:1343646967854534676>')
+          return await sendMessage(message, `user:${message.author.displayName} pinged you, message: ${message.content}`, true, client.tokenIndex)
+        }
         const messageChance = 1;
         const randomNum = Math.random();
         console.log("response chance " + randomNum)
 
         if (randomNum > messageChance) return;
-        const pings = ['<@1277282990782677034>', '@SpamEnjoyed.1984#4354', '@SpamEnjoyed'];
-
-        if (containsPing(message.content, pings)) {
-          return await sendMessage(message, `user:${message.author.displayName} pinged you, message: ${message.content}`, client.tokenIndex)
-        }
+        
 
         const emojiFormat = findRandomEmoji(message.content, message.guild.emojis.cache);
         if (!emojiFormat) return;
@@ -86,13 +100,13 @@ module.exports = async (client, message) => {
         if (randomValue < reactionChance) {
             await message.react(emojiFormat);
         } else {
-            await sendMessage(message, `user:${message.author.displayName} message: ${message.content}`, client.tokenIndex)
+            await sendMessage(message, `user:${message.author.displayName} message: ${message.content}`,false, client.tokenIndex)
             console.log(" inner token index ", client.tokenIndex)
 
         }
     } catch (err) {
         client.tokenIndex = client.tokenIndex >= jsonData.tokens.size ? 0 : client.tokenIndex + 1;
-        await sendMessage(message, `user:${message.author.displayName} message: ${message.content} `, client.tokenIndex)
+        await sendMessage(message, `user:${message.author.displayName} message: ${message.content} `, false,client.tokenIndex)
         console.log("There was an error: ", err, " token index ", client.tokenIndex)
     }
 };
