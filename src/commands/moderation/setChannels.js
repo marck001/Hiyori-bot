@@ -8,12 +8,12 @@ const { setChannel } = require('../../functions/config/setChannel')
 
 module.exports = {
     name: 'set-channel',
-    description: 'Saves files url',
+    description: 'Set channel for a function',
     options: [
        
         {
             name: 'channel-type',
-            description: 'give it a name',
+            description: 'select a function',
             required: false,
             type: ApplicationCommandOptionType.String,
             choices: [

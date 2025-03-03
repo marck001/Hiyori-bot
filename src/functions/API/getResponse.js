@@ -8,7 +8,7 @@ const jsonData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
 
 async function getResponse(history,userMessage,index) {
     try {
-        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        const response = await fetch(process.env.API_BASE, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${jsonData.tokens[index]}`,
@@ -36,7 +36,7 @@ async function getResponse(history,userMessage,index) {
   
         
         const botReply = data.choices[0].message.content;
-        console.log('messge:', botReply); 
+        console.log('message:', botReply); 
 
         return botReply;
 

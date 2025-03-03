@@ -2,7 +2,6 @@ const { Client, Message } = require('discord.js');
 require('dotenv').config();
 const { getConfig } = require('../../functions/config/getConfig')
 const { getResponse } = require('../../functions/API/getResponse')
-const { createWebHooK } = require('../../functions/general/createWebHook');
 const fs = require('fs');
 const path = require('path');
 const filePath = path.join(__dirname, '../../../data/chatbot.json');
@@ -22,7 +21,7 @@ function containsPing(content, pings) {
 }
 
 async function sendMessage(message, messageContent, isPing, tokenIndex) {
-  //  message.channel.sendTyping();
+    message.channel.sendTyping();
     const metadata = {
         userId: message.author.id,
         username: message.author.displayName,
@@ -35,11 +34,10 @@ async function sendMessage(message, messageContent, isPing, tokenIndex) {
     addMessageToHistory('user', message.content, metadata);
 
     const history = getMessageHistory(message.channel.id);
-    const webhookClient = createWebHooK(process.env.HIYORI_WEBHOOK)
     const replyMessage = await getResponse(history,messageContent, tokenIndex);
 
     if (replyMessage) {
-        await webhookClient.send(replyMessage);
+        await channel.send(replyMessage);
         console.log("Debug message: ", replyMessage)
     }
 }
@@ -85,7 +83,6 @@ module.exports = async (client, message) => {
         }
         const messageChance = 1;
         const randomNum = Math.random();
-        console.log("response chance " + randomNum)
 
         if (randomNum > messageChance) return;
         
@@ -95,7 +92,6 @@ module.exports = async (client, message) => {
 
         const reactionChance = 0;
         const randomValue = Math.random();
-        console.log("response type " + randomValue)
 
         if (randomValue < reactionChance) {
             await message.react(emojiFormat);
