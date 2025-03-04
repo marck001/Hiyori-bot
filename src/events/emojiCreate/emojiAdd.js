@@ -6,10 +6,6 @@ module.exports = async (client, newEmoji) => {
 
     try {
 
-        if (!newEmoji.guild) {
-            console.error("No guild associated with this emoji.");
-            return;
-        }
 
         const config = await  getConfig(newEmoji.guild.id,'emote-library')
         if (!config || config.isActive ===false) return;
@@ -17,7 +13,7 @@ module.exports = async (client, newEmoji) => {
 
         const channel = client.channels.cache.get(allowedChannelId);
 
-        if (!channel || newEmoji.channel.id !== allowedChannelId ) return;
+        if (!channel || channel.id !== allowedChannelId ) return;
 
 
         const emojiURL = newEmoji.animated
@@ -27,13 +23,6 @@ module.exports = async (client, newEmoji) => {
        
         const { body } = await request(emojiURL);
         const imageBuffer = await body.arrayBuffer();
-
-
-       
-        if (!channel) {
-            console.error("Channel not found!");
-            return;
-        }
 
 
         const emojiString = newEmoji.animated

@@ -28,7 +28,7 @@ module.exports = async (client, interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
   const localCommands = getLocalCommands();
-  console.log(localCommands);
+  //console.log(localCommands);
   const commandObject = localCommands.find(cmd => cmd.name === interaction.commandName);
 
   if (!commandObject) return;
