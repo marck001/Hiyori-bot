@@ -5,7 +5,7 @@ A multipurpose bot built using the Discord.js API module
 
 - [Node.js](https://nodejs.org/) (version 16.6.0 or higher)
 - A [Discord Developer Application](https://discord.com/developers/applications) for bot setup
-- [MySQL](https://www.mysql.com/) database setup (optional, if the bot interacts with a database)
+- [MySQL](https://www.mysql.com/) database setup 
 
 ## Setup Instructions
 
@@ -47,7 +47,7 @@ Create a `.env` file in the root directory to store your bot credentials and dat
 ### 4. Run the Bot
 Start the bot with the following command:
    ```bash
-   node index.js
+   node src/index.js
    ```
 
    If you're using [nodemon](https://www.npmjs.com/package/nodemon) for development, you can start the bot with:
