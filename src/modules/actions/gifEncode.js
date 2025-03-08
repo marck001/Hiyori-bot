@@ -1,10 +1,9 @@
 const { createCanvas, loadImage } = require('@napi-rs/canvas');
 const { quantize, applyPalette, GIFEncoder } = require('gifenc');
 
-
 const DEFAULT_DELAY = 20;
-
-
+const DEFAULT_RESOLUTION = 128;
+const IS_ROUNDED = false;
 async function loadFrames(url, FRAMES) {
     const frames = [];
     for (let i = 0; i < FRAMES; i++) {
@@ -148,5 +147,151 @@ async function generateSoCuteGif(avatarUrl, resolution, FRAMES) {
     return gifBuffer;
 }
 
+async function petpetMaker(imageUrl, FRAMES, delay = DEFAULT_DELAY, resolution = DEFAULT_RESOLUTION, rounded = IS_ROUNDED) {
 
-module.exports = { generatePetGif, generateSoCuteGif };
+
+    try {
+        const frames = await loadFrames(`https://raw.githubusercontent.com/VenPlugs/petpet/main/frames/pet`, 10);
+
+        const avatar = await loadImage(imageUrl);
+
+        const canvas = createCanvas(resolution, resolution);
+        const ctx = canvas.getContext('2d');
+
+
+        const gif = GIFEncoder();
+
+        for (let i = 0; i < FRAMES; i++) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+
+            const j = i < FRAMES / 2 ? i : FRAMES - i;
+            const width = 0.8 + j * 0.02;
+            const height = 0.8 - j * 0.05;
+            const offsetX = (1 - width) * 0.5 + 0.1;
+            const offsetY = 1 - height - 0.08;
+
+            if (rounded) {
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(
+                    (offsetX + width / 2) * resolution,
+                    (offsetY + height / 2) * resolution,
+                    (width * resolution) / 2,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.closePath();
+                ctx.clip();
+            }
+
+            ctx.drawImage(
+                avatar,
+                offsetX * resolution,
+                offsetY * resolution,
+                width * resolution,
+                height * resolution
+            );
+            if(rounded) ctx.restore();
+
+
+            ctx.drawImage(frames[i], 0, 0, resolution, resolution);
+
+
+            const imageData = ctx.getImageData(0, 0, resolution, resolution);
+            const palette = quantize(imageData.data, 256, { transparent: true });
+            const index = applyPalette(imageData.data, palette);
+
+
+            gif.writeFrame(index, resolution, resolution, {
+                transparent: true,
+                palette,
+                delay,
+            });
+        }
+
+
+        gif.finish();
+
+
+        const gifBuffer = Buffer.from(gif.bytesView());
+
+        return gifBuffer;
+    } catch (error) {
+        console.error('Error generating GIF:', error);
+    }
+}
+
+async function SoCuteMaker(imageUrl, FRAMES, delay = DEFAULT_DELAY, resolution = DEFAULT_RESOLUTION, rounded = IS_ROUNDED) {
+    const frames = await loadFrames(`https://raw.githubusercontent.com/marck001/Hiyori-bot/main/data/img/frames/cute/frame`, 12);
+    const avatar = await loadImage(imageUrl);
+
+    const canvas = createCanvas(resolution, resolution);
+    const ctx = canvas.getContext('2d');
+
+    const gif = GIFEncoder();
+
+    const SHAKE_AMPLITUDE = 3;
+    const SHAKE_FREQUENCY = 0.2;
+
+    for (let i = 0; i < FRAMES; i++) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+
+        const j = i < FRAMES / 2 ? i : FRAMES - i;
+        const width = 0.8 + j * 0.02;
+        const height = 0.8 - j * 0.05;
+        const offsetX = (1 - width) * 0.5 + 0.1;
+        const offsetY = 1 - height - 0.08;
+
+
+        const shakeOffset = Math.sin(i * SHAKE_FREQUENCY) * SHAKE_AMPLITUDE;
+
+        if (rounded) {
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(
+                (offsetX + width / 2) * resolution,
+                (offsetY + height / 2) * resolution,
+                (width * resolution) / 2,
+                0,
+                Math.PI * 2
+            );
+            ctx.closePath();
+            ctx.clip();
+        }
+
+        ctx.drawImage(
+            avatar,
+            offsetX * resolution + shakeOffset,
+            offsetY * resolution,
+            width * resolution,
+            height * resolution
+        );
+        ctx.restore();
+
+
+        ctx.drawImage(frames[i], 0, 0, resolution, resolution);
+
+
+        const imageData = ctx.getImageData(0, 0, resolution, resolution);
+        const palette = quantize(imageData.data, 256, { transparent: true });
+        const index = applyPalette(imageData.data, palette);
+
+        gif.writeFrame(index, resolution, resolution, {
+            transparent: true,
+            palette,
+            delay,
+        });
+    }
+
+    gif.finish();
+
+    const gifBuffer = Buffer.from(gif.bytesView());
+
+    return gifBuffer;
+}
+
+module.exports = { generatePetGif, generateSoCuteGif, petpetMaker, SoCuteMaker };
