@@ -24,8 +24,7 @@ module.exports = {
             if (queue.playing) {
 
                 if(queue.songs.length<=0){
-               await     interaction.editReply("There's no next song");
-                    return;
+                    return await interaction.editReply("There's no next song") ;
                 }
        
                 await queue.skip();

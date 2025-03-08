@@ -5,6 +5,7 @@ const path = require('path');
 const Canvas = require('@napi-rs/canvas');
 const { request } = require('undici');
 const { GlobalFonts } = Canvas
+const sharp = require('sharp');
 
 
 const filePath = path.join(__dirname, '../../../data/streakRecord.json');
@@ -14,34 +15,40 @@ GlobalFonts.registerFromPath(path.join(__dirname, '../../../data/fonts/arial.ttf
 
 
 
-module.exports = async ( streakCount,sticker, record,user,channel) => {
+module.exports = async (streakCount, sticker, record, user, channel) => {
 
 
     try {
         const canvas = Canvas.createCanvas(800, 400);
         const ctx = canvas.getContext('2d');
 
-        const background = await Canvas.loadImage( jsonData.background || 'https://media.sketchfab.com/models/c2400a60188e411c9c52add8983574e6/thumbnails/8ed44a79373a414688b64b3d351d2c30/e2f60297f67f494ea328f19eb022736e.jpeg');
+        const background = await Canvas.loadImage(jsonData.background || 'https://media.sketchfab.com/models/c2400a60188e411c9c52add8983574e6/thumbnails/8ed44a79373a414688b64b3d351d2c30/e2f60297f67f494ea328f19eb022736e.jpeg');
 
         ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 
 
-        const stickerX = canvas.width - 220;
+        const stickerX = canvas.width - 250;
         const stickerY = 90;
-        const stickerSize = 160;
+        const stickerSize = 220;
 
-        const stickerURL = sticker.animated
-        ? `https://cdn.discordapp.com/emojis/${sticker.id}.gif`
-        : `https://cdn.discordapp.com/emojis/${sticker.id}.png`;
+        const stickerURL = `https://cdn.discordapp.com/stickers/${sticker.id}.png`;
 
-   
         const { body } = await request(stickerURL);
-        const stickerImg = await Canvas.loadImage(await body.arrayBuffer());
+        const buffer = Buffer.from(await body.arrayBuffer());
+
+        // Convert APNG to PNG (if animated) or keep PNG (if static)
+        const imageBuffer = await sharp(buffer)
+            .toFormat('png')  // Ensures PNG output
+            .toBuffer();
+
+
+        const stickerImg = await Canvas.loadImage(imageBuffer);
+
         ctx.save();
 
         ctx.beginPath();
-        ctx.strokeStyle = '#000000';
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#FFD700';
+        ctx.lineWidth = 1;
         ctx.strokeRect(stickerX - 10, stickerY - 10, stickerSize + 20, stickerSize + 20);
         ctx.drawImage(stickerImg, stickerX, stickerY, stickerSize, stickerSize);
         ctx.restore();
@@ -51,37 +58,37 @@ module.exports = async ( streakCount,sticker, record,user,channel) => {
         ctx.strokeStyle = '#000000';
         ctx.lineWidth = 3;
         ctx.textAlign = 'center';
-        ctx.strokeText('New Streak Record', canvas.width / 3, 80);
-        ctx.fillText('New Streak Record', canvas.width / 3, 80);
-        
+        ctx.strokeText('New Streak Record', canvas.width / 3, 115);
+        ctx.fillText('New Streak Record', canvas.width / 3, 115);
+
         // Streak Count
         ctx.font = '30px Arial';
         ctx.fillStyle = '#ffffff';
         ctx.strokeStyle = '#000000';
-        ctx.strokeText(`${streakCount} × ${sticker.name}`, canvas.width / 3, 130);
-        ctx.fillText(`${streakCount} × ${sticker.name}`, canvas.width / 3, 130);
-        
+        ctx.strokeText(`${streakCount} × ${sticker.name}`, canvas.width / 3, 160);
+        ctx.fillText(`${streakCount} × ${sticker.name}`, canvas.width / 3, 160);
+
         // "In a row!"
         ctx.font = '28px Impact';
-        ctx.strokeText('In a row!', canvas.width / 3, 180);
-        ctx.fillText('In a row!', canvas.width / 3, 180);
-        
+        ctx.strokeText('In a row!', canvas.width / 3, 210);
+        ctx.fillText('In a row!', canvas.width / 3, 210);
+
         // Last record difference
         ctx.font = '22px Arial';
-        ctx.strokeText(`${record} of the last record`, canvas.width / 3, 230);
-        ctx.fillText(`${record} of the last record`, canvas.width / 3, 230);
-        
+        ctx.strokeText(`${record} of the last record`, canvas.width / 3, 260);
+        ctx.fillText(`${record} of the last record`, canvas.width / 3, 260);
+
         // Broken by user
         ctx.font = '24px Arial';
-        ctx.strokeText(`Broken by ${user.displayName}`, canvas.width / 3, 280);
-        ctx.fillText(`Broken by ${user.displayName}`, canvas.width / 3, 280);
+        ctx.strokeText(`Broken by ${user.displayName}`, canvas.width / 3, 310);
+        ctx.fillText(`Broken by ${user.displayName}`, canvas.width / 3, 310);
 
-       
+
 
         const attachment = new AttachmentBuilder(await canvas.encode('png'), { name: 'streakRecord-image.png' });
 
         await channel.send({
-            content: 'Test',
+            content: 'New Streak record',
             files: [attachment]
         });
         console.log("sent")
@@ -92,41 +99,3 @@ module.exports = async ( streakCount,sticker, record,user,channel) => {
 
 
 }
-/*
-function applyText(canvas, text) {
-    const ctx = canvas.getContext('2d');
-    let fontSize = 70;
-
-    do {
-        ctx.font = `${fontSize -= 10}px Arial`;
-    } while (ctx.measureText(text).width > canvas.width - 200);
-
-    return ctx.font;
-}
-
-function drawText(ctx, text, x, y, options = {}) {
-    const padding = options.padding || 10;
-    const bgColor = options.bgColor || 'rgba(0, 0, 0, 0.5)';
-    const textColor = options.textColor || '#ffffff';
-    const font = options.font || '32px Arial';
-
-    ctx.font = font;
-    const textWidth = ctx.measureText(text).width;
-    const textHeight = parseInt(font, 10);
-
-    const rectX = x - padding;
-    const rectY = y - textHeight;
-    const rectWidth = textWidth + padding * 2;
-    const rectHeight = textHeight + padding * 2;
-
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
-
-    ctx.strokeStyle = '#000000';
-    ctx.fillStyle = textColor;
-    ctx.lineWidth = 2;
-    ctx.strokeText(text, x, y);
-    ctx.fillText(text, x, y);
-}
-
-*/

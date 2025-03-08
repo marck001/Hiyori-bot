@@ -69,7 +69,7 @@ module.exports = async (interaction, pages, components, initPage = 0, time = 60 
             }
 
             const isOwner = blob.userId === i.user.id;
-            const isAdmin = interaction.member.roles.cache.has(ADMIN_ROLE_ID);
+            const isAdmin = i.member.permissions.has(PermissionsBitField.Flags.Administrator); 
 
             if (!isOwner && !isAdmin) {
                 return await i.followUp({
@@ -107,7 +107,7 @@ module.exports = async (interaction, pages, components, initPage = 0, time = 60 
             }
 
             const isOwner = blob.userId === i.user.id;
-            const isAdmin = interaction.member.roles.cache.has(ADMIN_ROLE_ID);
+            const isAdmin = i.member.permissions.has(PermissionsBitField.Flags.Administrator); 
 
             if (!isOwner && !isAdmin) {
                 return await i.followUp({

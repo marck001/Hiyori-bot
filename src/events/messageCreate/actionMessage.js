@@ -2,12 +2,8 @@ const { Client, Message } = require('discord.js');
 require('dotenv').config();
 const { getConfig } = require('../../functions/config/getConfig')
 const { getResponse } = require('../../functions/API/getResponse')
-const fs = require('fs');
-const path = require('path');
-const filePath = path.join(__dirname, '../../../data/chatbot.json');
-const jsonData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-const { getMessageHistory,addMessageToHistory} = require('../../modules/history/messageHistory')
-
+const { getMessageHistory, addMessageToHistory } = require('../../modules/history/messageHistory')
+const filterEmbed = require('../../components/embeds/filterEmbed');
 
 /**
  *
@@ -20,7 +16,8 @@ function containsPing(content, pings) {
     return wordsPatterns.some(pattern => pattern.test(content.toLowerCase()));
 }
 
-async function sendMessage(message, messageContent, isPing, tokenIndex) {
+async function sendMessage(client, message, messageContent, isPing, tokenIndex) {
+    // await new Promise(resolve => setTimeout(resolve, 8000)); 
     message.channel.sendTyping();
     const metadata = {
         userId: message.author.id,
@@ -34,11 +31,21 @@ async function sendMessage(message, messageContent, isPing, tokenIndex) {
     addMessageToHistory('user', message.content, metadata);
 
     const history = getMessageHistory(message.channel.id);
-    const replyMessage = await getResponse(history,messageContent, tokenIndex);
+
+    const replyMessage = await getResponse(client, history, messageContent, tokenIndex);
 
     if (replyMessage) {
         await channel.send(replyMessage);
-        console.log("Debug message: ", replyMessage)
+        if (replyMessage.includes('FILTERED!')) {
+         //   if (isPing) {
+                message.delete();
+                await filterEmbed(message.content, message.author, channel)
+       //     } else {
+         //       await channel.send(`-# I tried getting ${message.author.displayName} FILTERED!, but something went wrong. I guess you are saved for now`)
+       //     }
+
+        }
+        console.log("Debug message: ", replyMessage,"token index",client.tokenIndex)
     }
 }
 
@@ -74,18 +81,32 @@ module.exports = async (client, message) => {
         const allowedChannelId = config.channelId;
         const channel = client.channels.cache.get(allowedChannelId);
 
-        if (!channel || message.channel.id !== allowedChannelId || message.author.bot || message.stickers.size) return;
+        if (!channel || message.channel.id !== allowedChannelId || client.user.id === message.author.id || message.stickers.size) return;
+
+        console.log("username",client.user.username)
+
         const pings = ['<@1277282990782677034>', '@SpamEnjoyed.1984#4354', '@SpamEnjoyed'];
 
         if (containsPing(message.content, pings)) {
-          await  message.react('<:ping:1343646967854534676>')
-          return await sendMessage(message, `user:${message.author.displayName} pinged you, message: ${message.content}`, true, client.tokenIndex)
+            await message.react('<:ping:1343646967854534676>')
+            return await sendMessage(client, message, `user:${message.author.displayName} pinged you, message: ${message.content}`, true, client.tokenIndex)
+        } else if (message.reference) {
+            
+                const repliedMessage = await message.channel.messages.fetch(message.reference.messageId);
+
+
+                if (repliedMessage.author.id === client.user.id) {
+
+                    await sendMessage(client, message, `user:${message.author.displayName} message: ${message.content}`, false, client.tokenIndex);
+                    return;
+                }
+           
         }
         const messageChance = 1;
         const randomNum = Math.random();
 
         if (randomNum > messageChance) return;
-        
+
 
         const emojiFormat = findRandomEmoji(message.content, message.guild.emojis.cache);
         if (!emojiFormat) return;
@@ -96,13 +117,11 @@ module.exports = async (client, message) => {
         if (randomValue < reactionChance) {
             await message.react(emojiFormat);
         } else {
-            await sendMessage(message, `user:${message.author.displayName} message: ${message.content}`,false, client.tokenIndex)
-            console.log(" inner token index ", client.tokenIndex)
+            await sendMessage(client, message, `user:${message.author.displayName} message: ${message.content}`, false, client.tokenIndex)
+
 
         }
     } catch (err) {
-        client.tokenIndex = client.tokenIndex >= jsonData.tokens.size ? 0 : client.tokenIndex + 1;
-        await sendMessage(message, `user:${message.author.displayName} message: ${message.content} `, false,client.tokenIndex)
         console.log("There was an error: ", err, " token index ", client.tokenIndex)
     }
 };

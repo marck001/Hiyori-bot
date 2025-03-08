@@ -47,7 +47,7 @@ module.exports = {
       console.log('Playing audio')
 
       await interaction.followUp({
-        content: 'Playing audio...',
+        content: `Playing audio... ${url}`,
         ephemeral:true
       });
 

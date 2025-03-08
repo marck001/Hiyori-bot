@@ -1,10 +1,10 @@
-const { Client, Message } = require('discord.js');
+const { Client, Message, AttachmentBuilder } = require('discord.js');
 require('dotenv').config();
 const { getConfig } = require('../../functions/config/getConfig');
 const Counter = require('../../models/Counter');
 const streakRecordCanva = require('../../components/canvas/streakRecord');
 const { getRandomUrl } = require('../../functions/blob/getRandomUrl')
-
+const { generateStreakGif } = require('../../modules/actions/gifEncode');
 const streakData = new Map();
 /**
  *
@@ -54,11 +54,12 @@ module.exports = async (client, message) => {
                     break;
                 case (serverStreak.streakCount % 10 === 0):
                     await channel.send(`Wow, **${stickerName}** has a streak of **${serverStreak.streakCount}**!`);
-                    await channel.send(await getRandomUrl(guildId) || 'https://cdn.discordapp.com/emojis/1181355299618177035.gif');
+                    const source = await getRandomUrl(guildId);
+                    if (source) await channel.send(source);
                     break;
                 case (serverStreak.streakCount % 5 === 0):
-                    await channel.send(`**${stickerName}** has a streak of **${serverStreak.streakCount}**!`);
-                    await channel.send(await getRandomUrl(guildId) || 'https://cdn.discordapp.com/emojis/1181355299618177035.gif');
+    
+                    await channel.send({ content: `${stickerName} has a streak of ${serverStreak.streakCount}!` });
                     break;
             }
             console.log("server count ", serverStreak.streakCount)
