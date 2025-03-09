@@ -30,7 +30,7 @@ module.exports = async (client, newEmoji) => {
         : `<:${newEmoji.name}:${newEmoji.id}>`;
 
         await channel.send({
-            content: `${newEmoji.name}: ${emojiString} \n Author: ${newEmoji.author.displayName}`,
+            content: `${newEmoji.name}: ${emojiString} \n Emoji created by: **${newEmoji.author.displayName}**`,
             files: [
                 {
                     attachment: Buffer.from(imageBuffer),  

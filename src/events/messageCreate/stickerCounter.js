@@ -4,7 +4,6 @@ const { getConfig } = require('../../functions/config/getConfig');
 const Counter = require('../../models/Counter');
 const streakRecordCanva = require('../../components/canvas/streakRecord');
 const { getRandomUrl } = require('../../functions/blob/getRandomUrl')
-const { generateStreakGif } = require('../../modules/actions/gifEncode');
 const streakData = new Map();
 /**
  *

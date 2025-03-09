@@ -6,11 +6,11 @@ module.exports = {
     devOnly: true,
   
     callback: async (client, interaction) => {
-      await interaction.deferReply();
+      await interaction.deferReply({ ephemeral: true });
 
       const configs = await Config.findAll(  {where:{guildId:interaction.guild.id}})
 
-      if(!configs) return interaction.editReply('No config set yet');
+      if(!configs) return interaction.editReply({content:'No configuration set yet',ephemeral:true});
       const embed = new EmbedBuilder()
       .setColor(0x0099FF)
       .setTitle('----- Channels settings -----')
@@ -28,7 +28,7 @@ module.exports = {
       });
      
   
-      interaction.editReply({embeds: [embed]});
+      interaction.editReply({embeds: [embed],ephemeral:true});
     },
   };
   

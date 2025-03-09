@@ -69,9 +69,7 @@ module.exports = {
         const urlString = interaction.options.getString('url');
         const delay = interaction.options.getInteger('delay') || 20;
         const resolution = interaction.options.getInteger('resolution') || 128;
-        const isRounded = interaction.options.getBoolean('rounded');
-
-        console.log("rounde",isRounded)
+        const isRounded = interaction.options.getBoolean('rounded')?? false;
 
      
         try {
@@ -96,7 +94,6 @@ module.exports = {
 
             const imageUrl = await resolveImage(options, interaction);
 
-            console.log('Image URL:', imageUrl);
 
             let gifBuffer;
 
@@ -116,8 +113,8 @@ module.exports = {
             const attachment = new AttachmentBuilder(gifBuffer, { name: `output.gif` });
             const embed = new EmbedBuilder()
                 .setColor(Math.floor(Math.random() * 16777214) + 1)
-                .setDescription(`Your **${gifOption}** \n has been generated`)
                 .setImage(`attachment://output.gif`)
+                .setDescription(`Your **${gifOption}** gif \n has been generated!`)
                 .setTimestamp();
 
             await interaction.editReply({ content: null, embeds: [embed], files: [attachment] });

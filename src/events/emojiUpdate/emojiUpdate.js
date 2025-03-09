@@ -7,13 +7,6 @@ module.exports = async (client,oldEmoji, newEmoji) => {
     try {
 
        
-
-
-        if (!newEmoji.guild) {
-            console.error("No guild associated with this emoji.");
-            return;
-        }
-
         const config = await  getConfig(newEmoji.guild.id,'emote-library')
         if (!config || config.isActive ===false) return;
         const allowedChannelId = config.channelId;
@@ -43,7 +36,7 @@ module.exports = async (client,oldEmoji, newEmoji) => {
         : `<:${newEmoji.name}:${newEmoji.id}>`;
 
         await channel.send({
-            content: `Update ${oldEmoji.name} name to: ${newEmoji.name} ${emojiString}`,
+            content: ` ${oldEmoji.name} ${emojiString} has been updated to ${newEmoji.name} by `,
             files: [
                 {
                     attachment: Buffer.from(imageBuffer),  

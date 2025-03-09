@@ -61,6 +61,14 @@ module.exports = {
 
     callback: async (client, interaction) => {
 
+        if (!interaction.inGuild()) {
+            await interaction.reply({
+              content: 'This command can only be used in a server!',
+              ephemeral: true,
+            });
+            return;
+          }
+
         //if (!hasRole(interaction)) return;
         const channelObj = interaction.options.getChannel('channel');
         const channel= channelObj || interaction.channel;
@@ -70,7 +78,7 @@ module.exports = {
         if (!channelType) return interaction.reply({ content:"Channel type not selected",ephemeral:true})
 
 
-        await interaction.deferReply({ ephemeral: false });
+        await interaction.deferReply({ ephemeral: true });
 
       
         try {

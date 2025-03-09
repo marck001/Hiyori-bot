@@ -17,7 +17,6 @@ function containsPing(content, pings) {
 }
 
 async function sendMessage(client, message, messageContent, isPing, tokenIndex) {
-    // await new Promise(resolve => setTimeout(resolve, 8000)); 
     message.channel.sendTyping();
     const metadata = {
         userId: message.author.id,
@@ -50,27 +49,33 @@ async function sendMessage(client, message, messageContent, isPing, tokenIndex) 
 }
 
 function findRandomEmoji(content, emojis) {
-    const emojiRegex = /^<a?:\w+:\d+>$/;
-    const isSingleEmoji = emojiRegex.test(content);
+    const customEmojiRegex = /<a?:\w+:(\d+)>/g;
+    const matches = content.match(customEmojiRegex);
 
-    let matchedEmojis;
 
-    if (isSingleEmoji) {
-        const emojiName = content.match(/:\w+:/)[0].slice(1, -1).toLowerCase();
-        matchedEmojis = emojis.filter(emoji => emoji.name.toLowerCase().includes(emojiName));
-    } else {
-        const words = content.toLowerCase().split(/\s+/);
-        matchedEmojis = emojis.filter(emoji => {
-            const emojiName = emoji.name.toLowerCase();
-            return words.some(word => emojiName.includes(word) || word.includes(emojiName));
-        });
+    if (matches) {
+        const emojiIds = matches.map(match => match.match(/\d+/)[0]);
+        const matchedEmojis = emojiIds.map(id => emojis.get(id)).filter(emoji => emoji); 
+        if (matchedEmojis.length > 0) {
+            return matchedEmojis[Math.floor(Math.random() * matchedEmojis.length)]; 
+        }
     }
 
-    const emojiArray = matchedEmojis.size > 0 ? Array.from(matchedEmojis.values()) : Array.from(emojis.values());
-    if (emojiArray.length === 0) return null;
+    const words = content.toLowerCase().split(/\s+/); 
+    const emojiArray = Array.from(emojis.values());
 
-    const randomEmoji = emojiArray[Math.floor(Math.random() * emojiArray.length)];
-    return randomEmoji.animated ? `<a:${randomEmoji.name}:${randomEmoji.id}>` : `<:${randomEmoji.name}:${randomEmoji.id}>`;
+
+    const matchingEmojis = emojiArray.filter(emoji => {
+        const emojiName = emoji.name.toLowerCase();
+        return words.some(word => emojiName.includes(word) || word.includes(emojiName));
+    });
+
+
+    if (matchingEmojis.length > 0) {
+        return matchingEmojis[Math.floor(Math.random() * matchingEmojis.length)];
+    }
+
+    return emojiArray[Math.floor(Math.random() * emojiArray.length)];
 }
 
 module.exports = async (client, message) => {
@@ -83,9 +88,8 @@ module.exports = async (client, message) => {
 
         if (!channel || message.channel.id !== allowedChannelId || client.user.id === message.author.id || message.stickers.size) return;
 
-        console.log("username",client.user.username)
 
-        const pings = ['<@1277282990782677034>', '@SpamEnjoyed.1984#4354', '@SpamEnjoyed'];
+        const pings = [`<@${client.user.id}>`,'<@1277282990782677034>'];
 
         if (containsPing(message.content, pings)) {
             await message.react('<:ping:1343646967854534676>')
@@ -102,24 +106,21 @@ module.exports = async (client, message) => {
                 }
            
         }
-        const messageChance = 1;
-        const randomNum = Math.random();
+        const messageChance = 0.15;
 
-        if (randomNum > messageChance) return;
+        if ( Math.random()> messageChance) return;
 
 
         const emojiFormat = findRandomEmoji(message.content, message.guild.emojis.cache);
         if (!emojiFormat) return;
 
-        const reactionChance = 0;
+        const reactionChance = 0.6;
         const randomValue = Math.random();
 
         if (randomValue < reactionChance) {
             await message.react(emojiFormat);
         } else {
             await sendMessage(client, message, `user:${message.author.displayName} message: ${message.content}`, false, client.tokenIndex)
-
-
         }
     } catch (err) {
         console.log("There was an error: ", err, " token index ", client.tokenIndex)

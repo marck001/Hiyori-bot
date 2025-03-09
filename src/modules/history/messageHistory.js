@@ -47,8 +47,8 @@ function addMessageToHistory(role, content, metadata) {
     });
 
 
-    if (data.messages.length > 60) {
-        data.messages.splice(0, data.messages.length - 60); 
+    if (data.messages.length > 100) {
+        data.messages.splice(0, data.messages.length - 100); 
     }
 
     fs.writeFileSync(filePath, JSON.stringify(data, null, 2)); 

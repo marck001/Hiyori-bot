@@ -48,7 +48,7 @@ async function getResponse(client, history, userMessage, index) {
   } catch (err) {
 
     client.tokenIndex = client.tokenIndex >= jsonData.tokens.length - 1 ? 0 : client.tokenIndex + 1;
-    console.log("Unexpected error. Retrying with a new token...");
+    console.log("Unexpected error with the API...");
     return await getResponse(client, history, userMessage, client.tokenIndex);
   }
 
