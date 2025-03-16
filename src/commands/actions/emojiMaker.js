@@ -3,7 +3,7 @@ const {
     EmbedBuilder, AttachmentBuilder
 
 } = require('discord.js');
-const { petpetMaker, SoCuteMaker } = require('../../modules/actions/gifEncode');
+const { petpetMaker, SoCuteMaker,explosionMaker } = require('../../modules/actions/gifEncode');
 const { resolveImage } = require('../../functions/blob/resolveGifImage')
 module.exports = {
     deleted: false,
@@ -57,6 +57,12 @@ module.exports = {
             description: 'The image renders rounded shape.',
             type: ApplicationCommandOptionType.Boolean,
         },
+        {
+            name: 'no-server-avatar',
+            description: 'Use the personal user avatar instead of the server-specific one',
+            type: ApplicationCommandOptionType.Boolean,
+            required: false,
+        },
 
     ],
     devOnly: false,
@@ -70,6 +76,7 @@ module.exports = {
         const delay = interaction.options.getInteger('delay') || 20;
         const resolution = interaction.options.getInteger('resolution') || 128;
         const isRounded = interaction.options.getBoolean('rounded')?? false;
+        const noServerAvatar = !interaction.options.getBoolean('no-server-avatar')?? false; 
 
      
         try {
@@ -89,7 +96,7 @@ module.exports = {
             const options = [
                 { name: 'image', attachment: interaction.options.getAttachment('image') },
                 { name: 'url', value: urlString },
-                { name: 'user', value: interaction.options.getUser('user')?.id },
+                { name: 'user', value: interaction.options.getUser('user')?.id, noServerAvatar  },
             ];
 
             const imageUrl = await resolveImage(options, interaction);
@@ -102,7 +109,7 @@ module.exports = {
                     gifBuffer = await petpetMaker(imageUrl, 10, delay, resolution,isRounded);
                     break;
                 case "socute":
-                    gifBuffer = await SoCuteMaker(imageUrl, 12, delay, resolution,isRounded);
+                    gifBuffer = await explosionMaker(imageUrl, 17, delay, resolution,isRounded);
                     break;
                 default:
                     throw 'Invalid GIF option selected';
@@ -120,7 +127,7 @@ module.exports = {
             await interaction.editReply({ content: null, embeds: [embed], files: [attachment] });
         } catch (err) {
 
-            console.log(`There was an error here: ${err}`);
+            console.log(`There was an error in emoji maker: ${err}`);
           await  interaction.editReply({ content: 'You must select a source format either image, url or user. Try again',ephemeral: true});
 
         }
