@@ -13,7 +13,7 @@ module.exports = async (client, newEmoji) => {
 
         const channel = client.channels.cache.get(allowedChannelId);
 
-        if (!channel || channel.id !== allowedChannelId ) return;
+        if (!channel || channel.id !== allowedChannelId   ) return;
 
 
         const emojiURL = newEmoji.animated
@@ -30,7 +30,7 @@ module.exports = async (client, newEmoji) => {
         : `<:${newEmoji.name}:${newEmoji.id}>`;
 
         await channel.send({
-            content: `${newEmoji.name}: ${emojiString} \n Emoji created by: **${newEmoji.author.displayName}**`,
+            content: `${newEmoji.name}: ${emojiString} `,
             files: [
                 {
                     attachment: Buffer.from(imageBuffer),  

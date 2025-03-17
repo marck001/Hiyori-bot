@@ -1,6 +1,7 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js')
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, PermissionsBitField } = require('discord.js')
 const Blob = require('../../models/Blob');
 
+  
 module.exports = async (interaction, pages, components, initPage = 0, time = 500 * 1000) => {
 
 

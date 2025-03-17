@@ -17,7 +17,7 @@ module.exports = async (client, reaction, user) => {
         const allowedChannelId = config.channelId;
         const channel = client.channels.cache.get(allowedChannelId);
 
-        if (!channel || reaction.message.channel.id !== allowedChannelId || user.bot || !reaction) return;
+        if (!channel || reaction.message.channel.id !== allowedChannelId || user.bot || !reaction || client.user.id === reaction.message.author.id) return;
         const messageChance = 0.5;
         const randomNum = Math.random();
 

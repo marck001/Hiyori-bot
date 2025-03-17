@@ -13,7 +13,7 @@ module.exports = async (client,oldEmoji, newEmoji) => {
 
         const channel = client.channels.cache.get(allowedChannelId);
 
-        if (!channel || newEmoji.channel.id !== allowedChannelId ) return;
+        if (!channel || channel.id !== allowedChannelId ) return;
 
         const emojiURL = newEmoji.animated
             ? `https://cdn.discordapp.com/emojis/${newEmoji.id}.gif`
@@ -36,7 +36,7 @@ module.exports = async (client,oldEmoji, newEmoji) => {
         : `<:${newEmoji.name}:${newEmoji.id}>`;
 
         await channel.send({
-            content: ` ${oldEmoji.name} ${emojiString} has been updated to ${newEmoji.name} by `,
+            content: ` **${oldEmoji.name}** ${emojiString} has been updated to **${newEmoji.name} **`,
             files: [
                 {
                     attachment: Buffer.from(imageBuffer),  

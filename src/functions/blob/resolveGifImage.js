@@ -21,7 +21,20 @@ async function resolveImage(options, interaction) {
             case 'user':
                 if (opt.value) {
                     const user = await interaction.client.users.fetch(opt.value);
-                    if(user) return user.displayAvatarURL({ size: 2048, extension: 'png' });
+                    if (user) {
+                   
+                        if (opt.noServerAvatar && interaction.guild) {
+                            try {
+                                const member = await interaction.guild.members.fetch(user.id);                 
+                                return member.displayAvatarURL({ size: 2048, extension: 'png' }) || user.displayAvatarURL({ size: 2048, extension: 'png' });
+                            } catch (error) {
+                                console.log('User is not in the current guild. Using normal avatar.');
+                                return user.displayAvatarURL({ size: 2048, extension: 'png' });
+                            }
+                        }
+                       
+                        return user.displayAvatarURL({ size: 2048, extension: 'png' });
+                    }
                 }
                 break;
         }
