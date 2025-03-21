@@ -67,7 +67,7 @@ const {
         }
 
         
-        const existingFile = await Blob.findOne({ where: { url: urlString } });
+        const existingFile = await Blob.findOne({ where: { url: urlString, guildId:interaction.guild.id } });
       if (existingFile) {
         return interaction.editReply({
           content:'This file URL has been already saved in the database.', 
