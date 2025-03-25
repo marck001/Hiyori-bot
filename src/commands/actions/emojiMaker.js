@@ -1,10 +1,18 @@
 const {
     ApplicationCommandOptionType,
-    EmbedBuilder, AttachmentBuilder
-
+    EmbedBuilder,
+    AttachmentBuilder,
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    ModalBuilder,
+    TextInputBuilder,
+    TextInputStyle,
+    PermissionFlagsBits
 } = require('discord.js');
-const { petpetMaker, SoCuteMaker,explosionMaker } = require('../../modules/actions/gifEncode');
+const { petpetMaker, SoCuteMaker, explosionMaker } = require('../../modules/actions/gifEncode');
 const { resolveImage } = require('../../functions/blob/resolveGifImage')
+const emojiUpload = require('../../components/buttons/emojiUpload')
 module.exports = {
     deleted: false,
     name: 'make-emoji',
@@ -63,6 +71,13 @@ module.exports = {
             type: ApplicationCommandOptionType.Boolean,
             required: false,
         },
+        {
+            name: 'bg-remove',
+            description: 'Remove the background of the provided image, it might not sometimes work as expected',
+            type: ApplicationCommandOptionType.Boolean,
+            required: false,
+
+        }
 
     ],
     devOnly: false,
@@ -75,13 +90,14 @@ module.exports = {
         const urlString = interaction.options.getString('url');
         const delay = interaction.options.getInteger('delay') || 20;
         const resolution = interaction.options.getInteger('resolution') || 128;
-        const isRounded = interaction.options.getBoolean('rounded')?? false;
-        const noServerAvatar = !interaction.options.getBoolean('no-server-avatar')?? false; 
+        const isRounded = interaction.options.getBoolean('rounded') ?? false;
+        const noServerAvatar = !interaction.options.getBoolean('no-server-avatar') ?? false;
+        const isbgRemoved = interaction.options.getBoolean('bg-remove') ?? false;
 
-     
+
         try {
 
-            if (!img && !gifOption && !urlString) return interaction.reply({ content: 'You must select a source format among image, url and user. Try again',ephemeral: true});
+            if (!img && !gifOption && !urlString) return interaction.reply({ content: 'You must select a source format among image, url and user. Try again', ephemeral: true });
             await interaction.deferReply({ ephemeral: false });
 
             if (urlString) {
@@ -96,20 +112,20 @@ module.exports = {
             const options = [
                 { name: 'image', attachment: interaction.options.getAttachment('image') },
                 { name: 'url', value: urlString },
-                { name: 'user', value: interaction.options.getUser('user')?.id, noServerAvatar  },
+                { name: 'user', value: interaction.options.getUser('user')?.id, noServerAvatar },
             ];
 
-            const imageUrl = await resolveImage(options, interaction);
+            const imageUrl = await resolveImage(options, interaction, isbgRemoved);
 
 
             let gifBuffer;
 
             switch (gifOption) {
                 case "petpet":
-                    gifBuffer = await petpetMaker(imageUrl, 10, delay, resolution,isRounded);
+                    gifBuffer = await petpetMaker(imageUrl, 10, delay, resolution, isRounded);
                     break;
                 case "socute":
-                    gifBuffer = await explosionMaker(imageUrl, 17, delay, resolution,isRounded);
+                    gifBuffer = await explosionMaker(imageUrl, 17, delay, resolution, isRounded);
                     break;
                 default:
                     throw 'Invalid GIF option selected';
@@ -124,11 +140,12 @@ module.exports = {
                 .setDescription(`Your **${gifOption}** gif \n has been generated!`)
                 .setTimestamp();
 
-            await interaction.editReply({ content: null, embeds: [embed], files: [attachment] });
+            
+                await  emojiUpload(interaction,embed,attachment,gifBuffer)
         } catch (err) {
 
             console.log(`There was an error in emoji maker: ${err}`);
-          await  interaction.editReply({ content: 'You must select a source format either image, url or user. Try again',ephemeral: true});
+            await interaction.editReply({ content: 'You must select a source format either image, url or user. Try again', ephemeral: true });
 
         }
 
