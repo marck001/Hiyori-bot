@@ -9,15 +9,18 @@ const {
     PermissionFlagsBits
 } = require('discord.js');
 
-module.exports = async (interaction, embed, attachment,gifBuffer, time = 60 * 1000) => {
+module.exports = async (interaction, embed, attachment,gifBuffer, time = 80 * 1000) => {
 
 
    
-    const hasEmojiPerms = interaction.member.permissions.has(PermissionFlagsBits.ManageEmojisAndStickers);
+    const isInGuild = interaction.inGuild();
+    
+    const hasEmojiPerms = isInGuild && 
+        interaction.member.permissions.has(PermissionFlagsBits.ManageGuildExpressions);
 
     const actionRow = new ActionRowBuilder();
 
-    if (hasEmojiPerms) {
+    if (hasEmojiPerms ) {
         actionRow.addComponents(
             new ButtonBuilder()
                 .setCustomId('upload_emoji')
@@ -34,22 +37,23 @@ module.exports = async (interaction, embed, attachment,gifBuffer, time = 60 * 10
         components: hasEmojiPerms ? [actionRow] : []
     });
 
-   
     if (hasEmojiPerms) {
         const collector = reply.createMessageComponentCollector({
-            filter: i => i.customId === 'upload_emoji' && i.user.id === interaction.user.id,
+            filter: async (i) => {
+                if (i.user.id !== interaction.user.id) {
+                    await i.reply({
+                        content: "You cannot interact with this button.",
+                        ephemeral: true,
+                    });
+                    return false;
+                }
+                return true;
+            },
             time: time
         });
 
         collector.on('collect', async i => {
             try {
-                if (i.user.id !== interaction.user.id) {
-                    return i.reply({
-                        content: "You cannot interact with these buttons.",
-                        ephemeral: true,
-                    });
-                }
-                
                 const modal = new ModalBuilder()
                     .setCustomId('emoji_upload_modal')
                     .setTitle('Upload Emoji');
@@ -67,7 +71,6 @@ module.exports = async (interaction, embed, attachment,gifBuffer, time = 60 * 10
 
                 await i.showModal(modal);
 
-                
                 const modalInteraction = await i.awaitModalSubmit({
                     time: time,
                     filter: m => m.user.id === i.user.id,
@@ -77,7 +80,6 @@ module.exports = async (interaction, embed, attachment,gifBuffer, time = 60 * 10
 
                 const emojiName = modalInteraction.fields.getTextInputValue('emoji_name');
 
-                
                 if (!/^[a-zA-Z0-9_]+$/.test(emojiName)) {
                     return modalInteraction.reply({
                         content: 'Invalid emoji name! Only letters, numbers, and underscores are allowed.',
@@ -85,7 +87,6 @@ module.exports = async (interaction, embed, attachment,gifBuffer, time = 60 * 10
                     });
                 }
 
-                // Upload the emoji
                 try {
                     const createdEmoji = await interaction.guild.emojis.create({
                         attachment: gifBuffer,
@@ -114,10 +115,21 @@ module.exports = async (interaction, embed, attachment,gifBuffer, time = 60 * 10
             }
         });
 
-        collector.on('end', collected => {
-            if (collected.size === 0) {
-                actionRow.components[0].setDisabled(true);
-                interaction.editReply({ components: [actionRow] }).catch(console.error);
+        collector.on('end', (collected, reason) => {
+            try {
+
+                interaction.editReply({
+                    components: []
+                }).catch(console.error);
+                
+                if (reason === 'time') {
+                    interaction.followUp({
+                        content: 'The emoji upload button has expired.',
+                        ephemeral: true
+                    }).catch(console.error);
+                }
+            } catch (error) {
+                console.error('Error ending collector:', error);
             }
         });
     }
