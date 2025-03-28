@@ -125,7 +125,7 @@ module.exports = {
                     gifBuffer = await petpetMaker(imageUrl, 10, delay, resolution, isRounded);
                     break;
                 case "socute":
-                    gifBuffer = await explosionMaker(imageUrl, 17, delay, resolution, isRounded);
+                    gifBuffer = await SoCuteMaker(imageUrl, 12, delay, resolution, isRounded);
                     break;
                 default:
                     throw 'Invalid GIF option selected';

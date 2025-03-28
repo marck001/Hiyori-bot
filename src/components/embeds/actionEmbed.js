@@ -3,7 +3,7 @@ const {
     EmbedBuilder, AttachmentBuilder
 } = require('discord.js');
 
-const { generatePetGif, SoCuteMaker } = require('../../modules/actions/gifEncode')
+const { generatePetGif, SoCuteMaker, petpetMaker } = require('../../modules/actions/gifEncode')
 module.exports = async (replyMessage, message, isPing) => {
 
     let embed;
@@ -50,7 +50,7 @@ module.exports = async (replyMessage, message, isPing) => {
 
 
 
-
+ 
 
 }
 
