@@ -1,9 +1,10 @@
-const { Client, Message } = require('discord.js');
+const { Client, Message, WebhookClient } = require('discord.js');
 require('dotenv').config();
 const { getConfig } = require('../../functions/config/getConfig')
 const { getResponse } = require('../../functions/API/getResponse')
 const { getMessageHistory, addMessageToHistory } = require('../../modules/history/messageHistory')
-const filterEmbed = require('../../components/embeds/filterEmbed');
+const actionEmbed = require('../../components/embeds/actionEmbed');
+
 
 /**
  *
@@ -34,16 +35,11 @@ async function sendMessage(client, message, messageContent, isPing, tokenIndex) 
     const replyMessage = await getResponse(client, history, messageContent, tokenIndex);
 
     if (replyMessage) {
+       
         await channel.send(replyMessage);
-        if (replyMessage.includes('FILTERED!')) {
-         //   if (isPing) {
-                message.delete();
-                await filterEmbed(message.content, message.author, channel)
-       //     } else {
-         //       await channel.send(`-# I tried getting ${message.author.displayName} FILTERED!, but something went wrong. I guess you are saved for now`)
-       //     }
-
-        }
+        await actionEmbed(replyMessage,message,isPing)
+       // message.delete();
+    
         console.log("Debug message: ", replyMessage,"token index",client.tokenIndex)
     }
 }
@@ -86,7 +82,7 @@ module.exports = async (client, message) => {
         const allowedChannelId = config.channelId;
         const channel = client.channels.cache.get(allowedChannelId);
 
-        if (!channel || message.channel.id !== allowedChannelId || client.user.id === message.author.id || message.stickers.size) return;
+        if (!channel || message.channel.id !== allowedChannelId || client.user.id === message.author.id  ||message.author.bot) return;
 
 
         const pings = [`<@${client.user.id}>`,'<@1277282990782677034>'];
@@ -106,7 +102,7 @@ module.exports = async (client, message) => {
                 }
            
         }
-        const messageChance = 0.15;
+        const messageChance = 1;
 
         if ( Math.random()> messageChance) return;
 
@@ -114,7 +110,7 @@ module.exports = async (client, message) => {
         const emojiFormat = findRandomEmoji(message.content, message.guild.emojis.cache);
         if (!emojiFormat) return;
 
-        const reactionChance = 0.6;
+        const reactionChance = 0;
         const randomValue = Math.random();
 
         if (randomValue < reactionChance) {
