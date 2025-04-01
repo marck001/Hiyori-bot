@@ -73,6 +73,12 @@ module.exports = {
     },
 
     async autocomplete(interaction) {
+
+        if (!interaction.inGuild()) {
+            await interaction.respond([]); 
+            return;
+        }
+
         const focusedValue = interaction.options.getFocused();
         const guildId = interaction.guild.id;
 

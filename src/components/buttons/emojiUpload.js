@@ -8,130 +8,155 @@ const {
     TextInputStyle,
     PermissionFlagsBits
 } = require('discord.js');
+const messaEmbed = require('../embeds/messageEmbed')
+module.exports = async (interaction, embed, attachment, gifBuffer, time = 100 * 1000) => {
 
-module.exports = async (interaction, embed, attachment,gifBuffer, time = 80 * 1000) => {
 
+    try {
 
-   
-    const isInGuild = interaction.inGuild();
-    
-    const hasEmojiPerms = isInGuild && 
-        interaction.member.permissions.has(PermissionFlagsBits.ManageGuildExpressions);
+        const isInGuild = interaction.inGuild();
 
-    const actionRow = new ActionRowBuilder();
+        const hasEmojiPerms = isInGuild &&
+            interaction.member.permissions.has(PermissionFlagsBits.ManageGuildExpressions);
 
-    if (hasEmojiPerms ) {
-        actionRow.addComponents(
-            new ButtonBuilder()
-                .setCustomId('upload_emoji')
-                .setLabel('Upload as Emoji')
-                .setStyle(ButtonStyle.Primary)
-                .setEmoji('⬆️')
-        );
-    }
+        const actionRow = new ActionRowBuilder();
 
-    const reply = await interaction.editReply({
-        content: null,
-        embeds: [embed],
-        files: [attachment],
-        components: hasEmojiPerms ? [actionRow] : []
-    });
+        if (hasEmojiPerms) {
+            actionRow.addComponents(
+                new ButtonBuilder()
+                    .setCustomId('upload_emoji')
+                    .setLabel('Upload as Emoji')
+                    .setStyle(ButtonStyle.Primary)
+                    .setEmoji('⬆️')
+            );
+        }
 
-    if (hasEmojiPerms) {
-        const collector = reply.createMessageComponentCollector({
-            filter: async (i) => {
-                if (i.user.id !== interaction.user.id) {
-                    await i.reply({
-                        content: "You cannot interact with this button.",
-                        ephemeral: true,
-                    });
-                    return false;
-                }
-                return true;
-            },
-            time: time
+        const reply = await interaction.editReply({
+            content: null,
+            embeds: [embed],
+            files: [attachment],
+            components: hasEmojiPerms ? [actionRow] : []
+        }).catch(error => {
+            if (error.code === 10008) {
+                console.log('Message was deleted before could be edited');
+                return null;
+            }
+            throw error;
         });
 
-        collector.on('collect', async i => {
-            try {
-                const modal = new ModalBuilder()
-                    .setCustomId('emoji_upload_modal')
-                    .setTitle('Upload Emoji');
+        if (!reply) return;
 
-                const emojiNameInput = new TextInputBuilder()
-                    .setCustomId('emoji_name')
-                    .setLabel('Emoji Name (letters, numbers, _ only)')
-                    .setStyle(TextInputStyle.Short)
-                    .setMinLength(2)
-                    .setMaxLength(32)
-                    .setRequired(true);
+        if (hasEmojiPerms) {
+            const collector = reply.createMessageComponentCollector({
+                filter: async (i) => {
+                    if (i.user.id !== interaction.user.id) {
+                        await i.reply({
+                            content: "You cannot interact with this button.",
+                            ephemeral: true,
+                        });
+                        return false;
+                    }
+                    return true;
+                },
+                time: time
+            });
 
-                const firstActionRow = new ActionRowBuilder().addComponents(emojiNameInput);
-                modal.addComponents(firstActionRow);
-
-                await i.showModal(modal);
-
-                const modalInteraction = await i.awaitModalSubmit({
-                    time: time,
-                    filter: m => m.user.id === i.user.id,
-                }).catch(() => null);
-
-                if (!modalInteraction) return;
-
-                const emojiName = modalInteraction.fields.getTextInputValue('emoji_name');
-
-                if (!/^[a-zA-Z0-9_]+$/.test(emojiName)) {
-                    return modalInteraction.reply({
-                        content: 'Invalid emoji name! Only letters, numbers, and underscores are allowed.',
-                        ephemeral: true
-                    });
-                }
-
+            collector.on('collect', async i => {
                 try {
-                    const createdEmoji = await interaction.guild.emojis.create({
-                        attachment: gifBuffer,
-                        name: emojiName
+                    const modal = new ModalBuilder()
+                        .setCustomId('emoji_upload_modal')
+                        .setTitle('Upload Emoji');
+
+                    const emojiNameInput = new TextInputBuilder()
+                        .setCustomId('emoji_name')
+                        .setLabel('Emoji Name (letters, numbers, _ only)')
+                        .setStyle(TextInputStyle.Short)
+                        .setMinLength(2)
+                        .setMaxLength(32)
+                        .setRequired(true);
+
+                    const firstActionRow = new ActionRowBuilder().addComponents(emojiNameInput);
+                    modal.addComponents(firstActionRow);
+
+                    await i.showModal(modal).catch(error => {
+                        if (error.code === 10008) {
+                            console.log('Message was deleted before showing modal');
+                            return;
+                        }
+                        throw error;
                     });
 
-                    await modalInteraction.reply({
-                        content: `Successfully created emoji: ${createdEmoji}`,
-                        ephemeral: true
-                    });
-                } catch (emojiError) {
-                    console.error('Error creating emoji:', emojiError);
-                    await modalInteraction.reply({
-                        content: 'Failed to create emoji. The file might be too large or the server has reached its emoji limit.',
-                        ephemeral: true
-                    });
+                    const modalInteraction = await i.awaitModalSubmit({
+                        time: time,
+                        filter: m => m.user.id === i.user.id,
+                    }).catch(() => null);
+
+                    if (!modalInteraction) return;
+
+                    const emojiName = modalInteraction.fields.getTextInputValue('emoji_name');
+
+                    if (!/^[a-zA-Z0-9_]+$/.test(emojiName)) {
+                        return modalInteraction.reply({
+                            content: 'Invalid emoji name! Only letters, numbers, and underscores are allowed.',
+                            ephemeral: true
+                        });
+                    }
+
+                    try {
+                        const createdEmoji = await interaction.guild.emojis.create({
+                            attachment: gifBuffer,
+                            name: emojiName
+                        });
+
+                        await modalInteraction.reply({
+                            content: `Successfully created emoji: ${createdEmoji}`,
+                            ephemeral: true
+                        });
+                    } catch (emojiError) {
+                        console.error('Error creating emoji:', emojiError);
+                        await modalInteraction.reply({
+                            content: 'Failed to create emoji. The file might be too large or the server has reached its emoji limit.',
+                            ephemeral: true
+                        });
+                    }
+                } catch (error) {
+                    if (error.code === 10008) return;
+                    console.error('Error in button interaction:', error);
+                    if (!i.replied && !i.deferred) {
+                        await i.reply({
+                            content: 'An error occurred while processing your request.',
+                            ephemeral: true
+                        }).catch(console.error);
+                    }
                 }
-            } catch (error) {
-                console.error('Error in button interaction:', error);
-                if (!i.replied && !i.deferred) {
-                    await i.reply({
-                        content: 'An error occurred while processing your request.',
-                        ephemeral: true
+            });
+
+            collector.on('end', (collected, reason) => {
+                try {
+                    if (!reply.editable) return;
+
+                    interaction.editReply({
+                        components: []
                     }).catch(console.error);
-                }
-            }
-        });
+                    const messageEmbed = messaEmbed('The emoji upload button has expired.');
 
-        collector.on('end', (collected, reason) => {
-            try {
-
-                interaction.editReply({
-                    components: []
-                }).catch(console.error);
-                
-                if (reason === 'time') {
-                    interaction.followUp({
-                        content: 'The emoji upload button has expired.',
-                        ephemeral: true
-                    }).catch(console.error);
+                    if (reason === 'time') {
+                        interaction.followUp({
+                            content: null,
+                            embeds: [messageEmbed],
+                            ephemeral: true
+                        }).catch(console.error);
+                    }
+                } catch (error) {
+                    if (error.code === 10008) return;
+                    console.error('Error ending collector:', error);
                 }
-            } catch (error) {
-                console.error('Error ending collector:', error);
-            }
-        });
+            });
+        }
+    } catch (error) {
+        if (error.code === 10008) return; 
+        console.error('Error in emoji component:', error);
+
     }
 
 

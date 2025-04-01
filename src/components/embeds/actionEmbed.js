@@ -55,6 +55,3 @@ module.exports = async (replyMessage, message, isPing) => {
 }
 
 
-const includesWord = (replyMessage) => {
-    return replyMessage.includes('FILTERED!')
-}
