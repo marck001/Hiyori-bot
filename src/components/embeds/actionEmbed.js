@@ -20,7 +20,8 @@ module.exports = async (replyMessage, message, isPing) => {
                 .setDescription(`**${member.displayName}** got FILTERED! \n\n **${member.displayName} said: ** \n ${message.content}  `)
                 .setTimestamp();
             message.delete();
-            return await channel.send({ embeds: [embed] });
+            
+            return await channel.send({content:replyMessage, embeds: [embed] });
         } else {
             return await channel.send(`-# I tried getting ${message.author.displayName} FILTERED!, but something is stopping me. I guess you are saved for now...`)
         }
@@ -34,7 +35,7 @@ module.exports = async (replyMessage, message, isPing) => {
             .setDescription(`I'm patting **${member.displayName}** (˶˃ ᵕ ˂˶) `)
             .setImage(`attachment://petpet.gif`)
             .setTimestamp();
-        return await channel.send({ content: null, embeds: [embed], files: [attachment] });
+        return await channel.send({content:replyMessage, embeds: [embed], files: [attachment] });
     } else if (replyMessage.includes('soCute')) {
         const avatarUrl = member.displayAvatarURL({ size: 2048, extension: 'png' });
         const gifBuffer = await SoCuteMaker(avatarUrl, 12, 20, 100, true);
@@ -44,7 +45,9 @@ module.exports = async (replyMessage, message, isPing) => {
             .setDescription(` **${member.displayName}** is cute (˶˃ ᵕ ˂˶) `)
             .setImage(`attachment://socute.gif`)
             .setTimestamp();
-        return await channel.send({ content: null, embeds: [embed], files: [attachment] });
+        return await channel.send({ content:replyMessage, embeds: [embed], files: [attachment] });
+    }else{
+        return await channel.send({ content:replyMessage });
     }
 
 

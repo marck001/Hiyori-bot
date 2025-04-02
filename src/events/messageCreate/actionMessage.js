@@ -35,10 +35,8 @@ async function sendMessage(client, message, messageContent, isPing, tokenIndex) 
     const replyMessage = await getResponse(client, history, messageContent, tokenIndex);
 
     if (replyMessage) {
-       
-        await channel.send(replyMessage);
+         
         await actionEmbed(replyMessage,message,isPing)
-       // message.delete();
     
         console.log("Debug message: ", replyMessage,"token index",client.tokenIndex)
     }
