@@ -17,6 +17,7 @@ module.exports = {
     },
   ],
   devOnly: true,
+  inGuild:true,
 
   callback: async (client, interaction) => {
     const url = interaction.options.getString('music-url');

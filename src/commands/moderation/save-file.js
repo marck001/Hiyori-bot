@@ -41,6 +41,7 @@ const {
     ],
     deleted: false,
     devOnly: false,
+    inGuild:true,
    
   
     callback: async (client, interaction) => {

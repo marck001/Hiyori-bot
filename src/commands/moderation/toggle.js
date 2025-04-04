@@ -34,17 +34,10 @@ module.exports = {
     devOnly: true,
     deleted: false,
     autocomplete: true,
+    inGuild:true,
 
     callback: async (client, interaction) => {
 
-        if (!interaction.inGuild()) {
-            await interaction.reply({
-              content: 'This command can only be used in a server!',
-              ephemeral: true,
-            });
-            return;
-          }
-          
         const channelType = interaction.options.getString('config');
         const guildId = interaction.guild.id;
         try {

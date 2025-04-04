@@ -57,15 +57,9 @@ module.exports = {
     permissionsRequired: [PermissionFlagsBits.Administrator],
     botPermissions: [PermissionFlagsBits.Administrator],
     devOnly: true,
+    inGuild:true,
     callback: async (client, interaction) => {
 
-        if (!interaction.inGuild()) {
-            await interaction.reply({
-              content: 'This command can only be used in a server!',
-              ephemeral: true,
-            });
-            return;
-          }
 
         //if (!hasRole(interaction)) return;
         const channelObj = interaction.options.getChannel('channel');

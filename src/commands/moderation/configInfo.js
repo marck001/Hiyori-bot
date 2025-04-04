@@ -4,6 +4,7 @@ module.exports = {
     name: `config-info`,
     description: 'Information about configuration status',
     devOnly: true,
+    inGuild:true,
   
     callback: async (client, interaction) => {
       await interaction.deferReply({ ephemeral: true });

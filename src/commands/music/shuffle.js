@@ -6,6 +6,7 @@ module.exports = {
     name: 'shuffle',
     description: 'Shuffle a playlist getting played',
     devOnly: true,
+    inGuild:true,
 
     callback: async (client, interaction) => {
 

@@ -19,20 +19,6 @@ module.exports = {
       required: true,
       type: ApplicationCommandOptionType.String,
       autocomplete: true, 
-   /*    choices:[
-       {
-          name: 'evil-playlist',
-          value: 'evil-playlist'
-      },
-      {
-        name: 'neuro-playlist',
-        value: 'neuro-playlist'
-    },
-    {
-      name: 'tutel',
-      value: 'tutel'
-  },
-      ]*/
     },
     {
       name:'shuffle',
@@ -44,7 +30,8 @@ module.exports = {
     }
   ],
   devOnly: true,
-  autocomplete: true, 
+  autocomplete: true,
+  inGuild:true, 
 
   callback: async (client, interaction) => {
     const name = interaction.options.getString('playlist');

@@ -16,16 +16,6 @@ module.exports = {
             required: true,
             type: ApplicationCommandOptionType.String,
             autocomplete: true,
-       /*     choices:[
-                {
-                  name: 'break-streak',
-                  value: 'break'
-              },
-              {
-                name: 'record-streak',
-                value: 'streak'
-            },
-              ]*/
         },
         {
             name: 'page',
@@ -37,6 +27,7 @@ module.exports = {
     deleted: false,
     devOnly: true,
     autocomplete: true,
+    inGuild:true,
 
 
     callback: async (client, interaction) => {

@@ -8,15 +8,8 @@ const {
   
     name: 'autoplay',
     description: 'toggles autoplay mode',
-    /*options: [
-      {
-        name: 'playlist',
-        description: 'Selected playlist only',
-        required: false,
-        type: ApplicationCommandOptionType.String,
-      },
-    ],*/
     devOnly: true,
+    inGuild:true,
   
     callback: async (client, interaction) => {
       //const  playlist = interaction.options.getString('playlist');

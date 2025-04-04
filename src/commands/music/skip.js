@@ -5,6 +5,7 @@ module.exports = {
     name: 'skip',
     description: 'skips one song to the next',
     devOnly: true,
+    inGuild:true,
     callback: async (client, interaction) => {
 
         try {
