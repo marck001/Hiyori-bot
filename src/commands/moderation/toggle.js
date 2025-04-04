@@ -7,6 +7,15 @@ const {
 const { getConfig } = require('../../functions/config/getConfig')
 const Config = require('../../models/Config');
 
+const nameMap = new Map([
+    ["emoji-counter", "Emoji Counter"],
+    ["welcome", "Welcome Message"],
+    ["emote-library", "Emote Library"],
+    ["sticker-counter", "Sticker Counter"],
+    ["streak-record", "Streak Records"],
+    ["free-will", "Free Will"],
+  ]);
+
 module.exports = {
 
     name: 'toggle',
@@ -18,20 +27,6 @@ module.exports = {
             required: true,
             type: ApplicationCommandOptionType.String,
             autocomplete: true,
-            /*    choices:[
-                {
-                   name: 'evil-playlist',
-                   value: 'evil-playlist'
-               },
-               {
-                 name: 'neuro-playlist',
-                 value: 'neuro-playlist'
-             },
-             {
-               name: 'tutel',
-               value: 'tutel'
-           },
-               ]*/
         },
     ],
     permissionsRequired: [PermissionFlagsBits.Administrator],
@@ -99,7 +94,7 @@ module.exports = {
 
             await interaction.respond(
                 filteredConfigs.map(config => ({
-                    name: `${config.channelType}-${config.isActive ? 'enabled' : 'disabled'}`,
+                    name: `${config.isActive ? "🟢 • Disable" : "🔴 • Enable"} ${nameMap.get(config.channelType) ?? config.channelType}`,
                     value: config.channelType,
                 }))
             );
