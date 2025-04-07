@@ -1,4 +1,4 @@
-const { Client, Message, WebhookClient } = require('discord.js');
+const { Client, Message } = require('discord.js');
 require('dotenv').config();
 const { getConfig } = require('../../functions/config/getConfig')
 const { getResponse } = require('../../functions/API/getResponse')
@@ -17,7 +17,7 @@ function containsPing(content, pings) {
     return wordsPatterns.some(pattern => pattern.test(content.toLowerCase()));
 }
 
-async function sendMessage(client, message, messageContent, isPing, tokenIndex) {
+async function sendMessage(client, message, messageContent, isPing, tokenIndex, targetUser = null) {
     message.channel.sendTyping();
     const metadata = {
         userId: message.author.id,
@@ -26,18 +26,13 @@ async function sendMessage(client, message, messageContent, isPing, tokenIndex) 
         messageId: message.id,
         isPing: isPing,
     };
-    const channel = message.channel;
 
     addMessageToHistory('user', message.content, metadata);
-
     const history = getMessageHistory(message.channel.id);
-
     const replyMessage = await getResponse(client, history, messageContent, tokenIndex);
 
     if (replyMessage) {
-         
-        await actionEmbed(replyMessage,message,isPing)
-    
+        await actionEmbed(client,replyMessage,message,isPing, targetUser || message.member)
         console.log("Debug message: ", replyMessage,"token index",client.tokenIndex)
     }
 }
@@ -88,17 +83,13 @@ module.exports = async (client, message) => {
         if (containsPing(message.content, pings)) {
             await message.react('<:ping:1343646967854534676>')
             return await sendMessage(client, message, `user:${message.author.displayName} pinged you, message: ${message.content}`, true, client.tokenIndex)
-        } else if (message.reference) {
-            
+        } else if (message.reference) {          
                 const repliedMessage = await message.channel.messages.fetch(message.reference.messageId);
-
-
+                const targetUser =  await findTargetUser(message);
                 if (repliedMessage.author.id === client.user.id) {
-
-                    await sendMessage(client, message, `user:${message.author.displayName} message: ${message.content}`, false, client.tokenIndex);
+                    await sendMessage(client, message, `user:${message.author.displayName} message: ${message.content}`, false, client.tokenIndex, targetUser);
                     return;
-                }
-           
+                }       
         }
         const messageChance = 1;
 
@@ -120,3 +111,21 @@ module.exports = async (client, message) => {
         console.log("There was an error: ", err, " token index ", client.tokenIndex)
     }
 };
+
+async function findTargetUser(message) {
+ 
+    if (message.mentions.users.size > 0) {
+        return message.mentions.members.first();
+    }
+    
+    if (message.reference) {
+        try {
+            const repliedMessage = await message.channel.messages.fetch(message.reference.messageId);
+            return repliedMessage.member;
+        } catch (error) {
+            console.error("Couldn't fetch replied message:", error);
+        }
+    }
+    
+    return message.member;
+}
