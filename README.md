@@ -47,7 +47,7 @@ Create a `.env` file in the root directory to store your bot credentials and dat
 ### 4. Run the Bot
 Start the bot with the following command:
    ```bash
-   node src/index.js
+   node .
    ```
 
    If you're using [nodemon](https://www.npmjs.com/package/nodemon) for development, you can start the bot with:
