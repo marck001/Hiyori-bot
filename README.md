@@ -35,7 +35,7 @@ Create a `.env` file in the root directory to store your bot credentials and dat
    CLIENT_ID=YOUR_BOT_ID
 
 
-   # Database Credentials (optional)
+   # Database Credentials
    DB_HOST=YOUR_DB_HOST
    DB_PORT=YOUR_DB_PORT
    DB_USER=YOUR_DB_USER
