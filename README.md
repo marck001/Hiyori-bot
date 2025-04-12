@@ -33,7 +33,7 @@ Create a `.env` file in the root directory to store your bot credentials and dat
    TOKEN=YOUR_BOT_TOKEN
    GUILD_ID=YOUR_GUILD_ID
    CLIENT_ID=YOUR_BOT_ID
-   CHANNEL_ID=YOUR_CHANEL_ID_FOR_STREAK
+
 
    # Database Credentials (optional)
    DB_HOST=YOUR_DB_HOST
