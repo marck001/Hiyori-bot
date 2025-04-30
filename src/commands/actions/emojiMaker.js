@@ -110,7 +110,7 @@ module.exports = {
                 if (!isValidUrl) {
                     return interaction.editReply({
                         content: 'Invalid file URL. Please provide a valid image or GIF URL ending in .gif | .jpeg | .png like: \n ```https://example.com/mikugif.gif```',
-                        ephemeral: true
+                        ephemeral: true //! This will create a error, because you cannot set ephemeral on edit
                     });
                 }
             }
