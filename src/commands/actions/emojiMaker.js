@@ -2,15 +2,8 @@ const {
     ApplicationCommandOptionType,
     EmbedBuilder,
     AttachmentBuilder,
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-    ModalBuilder,
-    TextInputBuilder,
-    TextInputStyle,
-    PermissionFlagsBits
 } = require('discord.js');
-const { petpetMaker, SoCuteMaker, explosionMaker } = require('../../modules/actions/gifEncode');
+const { petpetMaker, SoCuteMaker } = require('../../modules/actions/gifEncode');
 const { resolveImage } = require('../../functions/blob/resolveGifImage')
 const emojiUpload = require('../../components/buttons/emojiUpload')
 module.exports = {
@@ -71,13 +64,6 @@ module.exports = {
             type: ApplicationCommandOptionType.Boolean,
             required: false,
         },
-        {
-            name: 'bg-remove',
-            description: 'Remove the background of the provided image, it might not sometimes work as expected',
-            type: ApplicationCommandOptionType.Boolean,
-            required: false,
-
-        }
 
     ],
     devOnly: false,
@@ -92,8 +78,6 @@ module.exports = {
         const resolution = interaction.options.getInteger('resolution') || 128;
         const isRounded = interaction.options.getBoolean('rounded') ?? false;
         const noServerAvatar = !interaction.options.getBoolean('no-server-avatar') ?? false;
-        const isbgRemoved = interaction.options.getBoolean('bg-remove') ?? false;
-
 
         try {
 
