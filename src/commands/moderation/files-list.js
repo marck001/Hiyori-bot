@@ -1,6 +1,6 @@
 const {
     ApplicationCommandOptionType,
-    EmbedBuilder,   PermissionFlagsBits, ButtonBuilder, ButtonStyle, ActionRowBuilder
+    EmbedBuilder,   ButtonBuilder, ButtonStyle, ActionRowBuilder
   } = require('discord.js');
   
   const Blob = require('../../models/Blob'); 
@@ -26,6 +26,7 @@ const {
     ],
     deleted: false,
     devOnly: false,
+    inGuild:true,
   
     callback: async (client, interaction) => {
      

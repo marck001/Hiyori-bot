@@ -4,18 +4,13 @@ const sequelize = require('../../db/sequelize');
 
 async function getRandomUrl(guildId) {
     try {
-        const blob = await Blob.findOne({ order: sequelize.random() ,where: {guildId:guildId}})
+        const blob = await Blob.findOne({ order: sequelize.random(), where: { guildId: guildId } })
+        if (blob) return blob.url;
+        return null
 
-        const blobUrl = blob.url;
-        if (!blob) {
-            throw new Error('No blob found.');
-        }
-
-        console.log(blobUrl)
-        return blobUrl;
 
     } catch (err) {
-        console.error('Error retrieving random URL:', err);
+        console.error('Error retrieving random URL:');
         throw err;
     }
 

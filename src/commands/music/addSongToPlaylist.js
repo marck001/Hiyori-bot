@@ -38,6 +38,7 @@ module.exports = {
     ],
     devOnly: true,
     autocomplete: true, 
+    inGuild:true,
 
 
     callback: async (client, interaction) => {

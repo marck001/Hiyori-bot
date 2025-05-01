@@ -2,11 +2,8 @@ const { Client, Message } = require('discord.js');
 require('dotenv').config();
 const { getConfig } = require('../../functions/config/getConfig')
 const { getResponse } = require('../../functions/API/getResponse')
-const { createWebHooK } = require('../../functions/general/createWebHook');
-const fs = require('fs');
-const path = require('path');
-const filePath = path.join(__dirname, '../../../data/chatbot.json');
-const jsonData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+const { getMessageHistory, addMessageToHistory } = require('../../modules/history/messageHistory')
+const actionEmbed = require('../../components/embeds/actionEmbed');
 
 
 /**
@@ -14,6 +11,62 @@ const jsonData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
  * @param {Client} client
  * @param {Message} message
  */
+
+function containsPing(content, pings) {
+    const wordsPatterns = pings.map(word => new RegExp(word.split('').join('[\\s-]*'), 'i'));
+    return wordsPatterns.some(pattern => pattern.test(content.toLowerCase()));
+}
+
+async function sendMessage(client, message, messageContent, isPing, tokenIndex) {
+    message.channel.sendTyping();
+    const metadata = {
+        userId: message.author.id,
+        username: message.author.displayName,
+        channelId: message.channel.id,
+        messageId: message.id,
+        isPing: isPing,
+    };
+
+    addMessageToHistory('user', message.content, metadata);
+    const history = getMessageHistory(message.channel.id);
+    const replyMessage = await getResponse(client, history, messageContent, tokenIndex);
+
+    if (replyMessage) {
+        const targetUser =  await findTargetUser(message,client);
+        await actionEmbed(client,replyMessage,message,isPing, targetUser || message.member)
+        console.log("Debug message: ", replyMessage,"token index",client.tokenIndex)
+    }
+}
+
+function findRandomEmoji(content, emojis) {
+    const customEmojiRegex = /<a?:\w+:(\d+)>/g;
+    const matches = content.match(customEmojiRegex);
+
+
+    if (matches) {
+        const emojiIds = matches.map(match => match.match(/\d+/)[0]);
+        const matchedEmojis = emojiIds.map(id => emojis.get(id)).filter(emoji => emoji); 
+        if (matchedEmojis.length > 0) {
+            return matchedEmojis[Math.floor(Math.random() * matchedEmojis.length)]; 
+        }
+    }
+
+    const words = content.toLowerCase().split(/\s+/); 
+    const emojiArray = Array.from(emojis.values());
+
+
+    const matchingEmojis = emojiArray.filter(emoji => {
+        const emojiName = emoji.name.toLowerCase();
+        return words.some(word => emojiName.includes(word) || word.includes(emojiName));
+    });
+
+
+    if (matchingEmojis.length > 0) {
+        return matchingEmojis[Math.floor(Math.random() * matchingEmojis.length)];
+    }
+
+    return emojiArray[Math.floor(Math.random() * emojiArray.length)];
+}
 
 module.exports = async (client, message) => {
 
@@ -23,100 +76,56 @@ module.exports = async (client, message) => {
         const allowedChannelId = config.channelId;
         const channel = client.channels.cache.get(allowedChannelId);
 
-        if (!channel || message.channel.id !== allowedChannelId || message.author.bot || message.stickers.size) return;
-        const messageChance = 1;
-        const randomNum = Math.random();
-        console.log("response chance " + randomNum)
+        if (!channel || message.channel.id !== allowedChannelId || client.user.id === message.author.id  ||message.author.bot) return;
 
-        if (randomNum > messageChance) return;
 
-        const guild = message.guild;
-        const emojis = guild.emojis.cache;
+        const pings = [`<@${client.user.id}>`,'<@1277282990782677034>'];
 
-        const words = message.content.split(/\s+/);
-        console.log("words ", words)
-
-        let emojiFormat;
-
-        const emojiRegex = /^<a?:\w+:\d+>$/;
-
-        if (emojiRegex.test(message.content)) {
-
-            const emojiName = message.content.match(/:\w+:/)[0].slice(1, -1);
-
-            const similarEmojis = emojis.filter(emoji => {
-                const serverEmojiName = emoji.name.toLowerCase();
-                const inputEmojiName = emojiName.toLowerCase();
-
-                return (
-                    serverEmojiName.includes(inputEmojiName) ||
-                    inputEmojiName.includes(serverEmojiName)
-                );
-            });
-
-            if (similarEmojis.size > 0) {
-                const emojiArray = Array.from(similarEmojis.values());
-                const randomEmoji = emojiArray[Math.floor(Math.random() * emojiArray.length)];
-                emojiFormat = randomEmoji.animated ? `<a:${randomEmoji.name}:${randomEmoji.id}>` : `<:${randomEmoji.name}:${randomEmoji.id}>`;
-            } else {
-                const emojiArray = Array.from(emojis.values());
-                if (emojiArray.length === 0) return ;
-                const randomEmoji = emojiArray[Math.floor(Math.random() * emojiArray.length)];
-                emojiFormat = randomEmoji.animated ? `<a:${randomEmoji.name}:${randomEmoji.id}>` : `<:${randomEmoji.name}:${randomEmoji.id}>`;
-            }
-        } else {
-            const words = message.content.toLowerCase().split(/\s+/);
-            const matchedEmojis = emojis.filter(emoji => {
-                const emojiName = emoji.name.toLowerCase();
-                return words.some(word => emojiName.includes(word) || word.includes(emojiName));
-            });
-
-            if (matchedEmojis.size > 0) {
-
-                const emojiArray = Array.from(matchedEmojis.values());
-                const randomEmoji = emojiArray[Math.floor(Math.random() * emojiArray.length)];
-                emojiFormat = randomEmoji.animated ? `<a:${randomEmoji.name}:${randomEmoji.id}>` : `<:${randomEmoji.name}:${randomEmoji.id}>`;
-            } else {
-
-                const emojiArray = Array.from(emojis.values());
-                if (emojiArray.length === 0) return ;
-            
-                const randomEmoji = emojiArray[Math.floor(Math.random() * emojiArray.length)];
-                emojiFormat = randomEmoji.animated ? `<a:${randomEmoji.name}:${randomEmoji.id}>` : `<:${randomEmoji.name}:${randomEmoji.id}>`;
-            }
+        if (containsPing(message.content, pings)) {
+            await message.react('<:ping:1343646967854534676>')
+            return await sendMessage(client, message, `user:${message.author.displayName} pinged you, message: ${message.content}`, true, client.tokenIndex)
+        } else if (message.reference) {          
+                const repliedMessage = await message.channel.messages.fetch(message.reference.messageId);          
+                if (repliedMessage.author.id === client.user.id) {
+                    await sendMessage(client, message, `user:${message.author.displayName} message: ${message.content}`, false, client.tokenIndex);
+                    return;
+                }       
         }
+        const messageChance = 1;
+
+        if ( Math.random()> messageChance) return;
+        const emojiFormat = findRandomEmoji(message.content, message.guild.emojis.cache);
+        if (!emojiFormat) return;
+
         const reactionChance = 0;
         const randomValue = Math.random();
-        console.log("response type " + randomValue)
 
         if (randomValue < reactionChance) {
-
             await message.react(emojiFormat);
         } else {
-            message.channel.sendTyping();
-            const webhookClient = createWebHooK(process.env.HIYORI_WEBHOOK)
-            const replyMessage = await getResponse(`user:${message.author.displayName} message: ${message.content}`,client.tokenIndex);
-            
-            if(replyMessage){
-                await webhookClient.send(replyMessage);
-                console.log("Debug message: ",replyMessage)
-            }
-
-            console.log(" inner token index ",client.tokenIndex)
-
+            await sendMessage(client, message, `user:${message.author.displayName} message: ${message.content}`, false, client.tokenIndex)
         }
     } catch (err) {
-        client.tokenIndex = client.tokenIndex>jsonData.tokens.size ? 0 : client.tokenIndex +1;
-        const replyMessage = await getResponse(`user:${message.author.displayName} message: ${message.content} `,client.tokenIndex);
-            
-        if(replyMessage){
-            await webhookClient.send(replyMessage);
-            console.log("Debug message: ",replyMessage)
-        }
-        console.log("There was an error: ", err," token index ",client.tokenIndex)
+        console.log("There was an error: ", err, " token index ", client.tokenIndex)
     }
-
-
-
-
 };
+
+async function findTargetUser(message,client) {
+ 
+    if (message.mentions.users.size > 0) {
+        const mentionedUsers = message.mentions.users.filter(user => user.id !== client.user.id);
+        if (mentionedUsers.size > 0) {
+            return message.guild.members.cache.get(mentionedUsers.first().id);
+        }
+    }
+    
+    if (message.reference) {
+        try {
+            const repliedMessage = await message.channel.messages.fetch(message.reference.messageId);
+            return repliedMessage.member;
+        } catch (error) {
+            console.error("Couldn't fetch replied message:", error);
+        }
+    } 
+    return message.member;
+}

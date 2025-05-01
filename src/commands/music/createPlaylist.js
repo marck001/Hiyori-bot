@@ -18,7 +18,8 @@ module.exports = {
         },
     ],
     devOnly: true,
-    permissionsRequired: [PermissionFlagsBits.Administrator],
+    inGuild:true,
+   // permissionsRequired: [PermissionFlagsBits.Administrator],
 
     callback: async (client, interaction) => {
         const name = interaction.options.getString('name');

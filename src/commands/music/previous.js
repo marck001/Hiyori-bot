@@ -5,6 +5,7 @@ module.exports = {
     name: 'previous',
     description: 'goes back to previous song',
     devOnly: true,
+    inGuild:true,
     callback: async (client, interaction) => {
 
         try {

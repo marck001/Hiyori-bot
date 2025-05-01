@@ -32,6 +32,7 @@ const ytdl = require('ytdl-core');
      */
 
     client.deleteMessages = false;
+    client.tokenIndex = 0;
 
     client.distube = new DisTube(client, {
       emitNewSongOnly: true,
@@ -50,7 +51,7 @@ const ytdl = require('ytdl-core');
     eventHandler(client);
 
     client.on('ready', (c) => {
-      client.user.setActivity('Music');
+      client.user.setActivity('void');
 
     });
 

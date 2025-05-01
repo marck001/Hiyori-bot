@@ -12,11 +12,9 @@ module.exports = async (client, interaction) => {
     const localCommands = getLocalCommands();
     const commandObject = localCommands.find(cmd => cmd.name === interaction.commandName);
 
-  
     if (!commandObject || typeof commandObject.autocomplete !== 'function') return;
 
     try {
-     // console.log(`Autocomplete for command: ${commandObject.name}`);
       await commandObject.autocomplete(interaction);
     } catch (error) {
       console.error(`Error in autocomplete for command ${commandObject.name}:`, error);
@@ -28,11 +26,10 @@ module.exports = async (client, interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
   const localCommands = getLocalCommands();
-  console.log(localCommands);
   const commandObject = localCommands.find(cmd => cmd.name === interaction.commandName);
 
   if (!commandObject) return;
-  console.log(`Command executed: ${commandObject.name}`);
+  console.log(`Command executed: ${commandObject.name} by ${interaction.user.displayName}`);
 
   try {
 
@@ -54,10 +51,8 @@ module.exports = async (client, interaction) => {
     const defaultCooldownDuration = 5;
     const cooldownAmount = (commandObject.cooldown ?? defaultCooldownDuration) * 1_000;
 
-
     if (timestamps.has(interaction.user.id)) {
       const expirationTime = timestamps.get(interaction.user.id) + cooldownAmount;
-
       if (now < expirationTime) {
         const expiredTimestamp = Math.round(expirationTime / 1_000);
         return interaction.reply({ content: `Please wait, you are on a cooldown for \`${commandObject.name}\`. You can use it again in ${defaultCooldownDuration}s <t:${expiredTimestamp}:R>.`, ephemeral: true });
@@ -68,6 +63,15 @@ module.exports = async (client, interaction) => {
     timestamps.set(interaction.user.id, now);
     setTimeout(() => timestamps.delete(interaction.user.id), cooldownAmount);
 
+    if (commandObject.inGuild) {
+      if (!interaction.inGuild()) {
+        interaction.reply({
+          content: 'This command can only be used in a server!',
+          ephemeral: true,
+        });
+        return;
+      }
+    }
 
     if (commandObject.devOnly) {
       if (!devs.includes(interaction.member.id)) {

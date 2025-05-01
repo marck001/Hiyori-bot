@@ -27,11 +27,16 @@ const {
     permissionsRequired: [PermissionFlagsBits.Administrator],
     botPermissions: [PermissionFlagsBits.Administrator],
     devOnly: true,
+    inGuild:true,
   
     callback: async (client, interaction) => {
+
+
       const channelObj = interaction.options.getChannel('channel');
       const message = interaction.options.getString('text');
       const channel = channelObj || interaction.channel;
+
+
       
       if (channel.type === ChannelType.GuildCategory) {
         interaction.reply({

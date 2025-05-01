@@ -7,20 +7,13 @@ module.exports = async (client,oldEmoji, newEmoji) => {
     try {
 
        
-
-
-        if (!newEmoji.guild) {
-            console.error("No guild associated with this emoji.");
-            return;
-        }
-
         const config = await  getConfig(newEmoji.guild.id,'emote-library')
         if (!config || config.isActive ===false) return;
         const allowedChannelId = config.channelId;
 
         const channel = client.channels.cache.get(allowedChannelId);
 
-        if (!channel || newEmoji.channel.id !== allowedChannelId ) return;
+        if (!channel || channel.id !== allowedChannelId ) return;
 
         const emojiURL = newEmoji.animated
             ? `https://cdn.discordapp.com/emojis/${newEmoji.id}.gif`
@@ -43,7 +36,7 @@ module.exports = async (client,oldEmoji, newEmoji) => {
         : `<:${newEmoji.name}:${newEmoji.id}>`;
 
         await channel.send({
-            content: `Update ${oldEmoji.name} name to: ${newEmoji.name} ${emojiString}`,
+            content: ` **${oldEmoji.name}** ${emojiString} has been updated to **${newEmoji.name} **`,
             files: [
                 {
                     attachment: Buffer.from(imageBuffer),  

@@ -5,7 +5,7 @@ A multipurpose bot built using the Discord.js API module
 
 - [Node.js](https://nodejs.org/) (version 16.6.0 or higher)
 - A [Discord Developer Application](https://discord.com/developers/applications) for bot setup
-- [MySQL](https://www.mysql.com/) database setup (optional, if the bot interacts with a database)
+- [MySQL](https://www.mysql.com/) database setup 
 
 ## Setup Instructions
 
@@ -33,9 +33,9 @@ Create a `.env` file in the root directory to store your bot credentials and dat
    TOKEN=YOUR_BOT_TOKEN
    GUILD_ID=YOUR_GUILD_ID
    CLIENT_ID=YOUR_BOT_ID
-   CHANNEL_ID=YOUR_CHANEL_ID_FOR_STREAK
 
-   # Database Credentials (optional)
+
+   # Database Credentials
    DB_HOST=YOUR_DB_HOST
    DB_PORT=YOUR_DB_PORT
    DB_USER=YOUR_DB_USER
@@ -47,7 +47,7 @@ Create a `.env` file in the root directory to store your bot credentials and dat
 ### 4. Run the Bot
 Start the bot with the following command:
    ```bash
-   node index.js
+   node .
    ```
 
    If you're using [nodemon](https://www.npmjs.com/package/nodemon) for development, you can start the bot with:

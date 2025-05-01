@@ -5,6 +5,7 @@ module.exports = {
     description: 'Stops the current music being played',
     deleted: false,
     devOnly: true,
+    inGuild:true,
 
     callback: async (client, interaction) => {
 

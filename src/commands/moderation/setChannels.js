@@ -8,34 +8,34 @@ const { setChannel } = require('../../functions/config/setChannel')
 
 module.exports = {
     name: 'set-channel',
-    description: 'Saves files url',
+    description: 'Set channel for a function',
     options: [
        
         {
             name: 'channel-type',
-            description: 'give it a name',
+            description: 'select a function',
             required: false,
             type: ApplicationCommandOptionType.String,
             choices: [
                 {
-                    name: 'sticker-counter',
+                    name: 'Sticker Counter',
                     value: 'sticker-counter'
                 },
                 {
-                    name: 'emoji-counter',
+                    name: 'Emoji Counter',
                     value: 'emoji-counter'
                 }, {
-                    name: 'streak-record',
+                    name: 'Streak Records',
                     value: 'streak-record'
                 },{
-                    name:'welcome',
+                    name:'Welcome Message',
                     value:'welcome'
                 },{
-                    name:'emote-library',
+                    name:'Emote Library',
                     value:'emote-library'
                 }
                 ,{
-                    name:'free-will',
+                    name:'Free Will',
                     value:'free-will'
                 }
             ]
@@ -57,9 +57,9 @@ module.exports = {
     permissionsRequired: [PermissionFlagsBits.Administrator],
     botPermissions: [PermissionFlagsBits.Administrator],
     devOnly: true,
-
-
+    inGuild:true,
     callback: async (client, interaction) => {
+
 
         //if (!hasRole(interaction)) return;
         const channelObj = interaction.options.getChannel('channel');
@@ -68,18 +68,10 @@ module.exports = {
         const isActive = interaction.options.getBoolean('active')?.true;
 
         if (!channelType) return interaction.reply({ content:"Channel type not selected",ephemeral:true})
-
-
-        await interaction.deferReply({ ephemeral: false });
-
-      
+        await interaction.deferReply({ ephemeral: true });
         try {
-
             const guildId = interaction.guild.id
-
             await setChannel(interaction,guildId, channel.id,channelType,isActive)
-
-
         } catch (error) {
             console.error('Error channel:', error);
             interaction.editReply({ content: 'An error occurred while saving channel.', ephemeral: true });

@@ -1,13 +1,13 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js')
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, PermissionsBitField } = require('discord.js')
 const Blob = require('../../models/Blob');
-const { adminId } = require('../../../config.json');
-module.exports = async (interaction, pages, components, initPage = 0, time = 60 * 1000) => {
+
+  
+module.exports = async (interaction, pages, components, initPage = 0, time = 500 * 1000) => {
 
 
     if (!interaction || !pages || pages.length === 0)
         throw new Error("[PAGINATION] Invalid arguments");
 
-    const ADMIN_ROLE_ID = adminId; 
 
     let index = initPage;
 
@@ -69,7 +69,7 @@ module.exports = async (interaction, pages, components, initPage = 0, time = 60 
             }
 
             const isOwner = blob.userId === i.user.id;
-            const isAdmin = interaction.member.roles.cache.has(ADMIN_ROLE_ID);
+            const isAdmin = i.member.permissions.has(PermissionsBitField.Flags.Administrator); 
 
             if (!isOwner && !isAdmin) {
                 return await i.followUp({
@@ -107,7 +107,7 @@ module.exports = async (interaction, pages, components, initPage = 0, time = 60 
             }
 
             const isOwner = blob.userId === i.user.id;
-            const isAdmin = interaction.member.roles.cache.has(ADMIN_ROLE_ID);
+            const isAdmin = i.member.permissions.has(PermissionsBitField.Flags.Administrator); 
 
             if (!isOwner && !isAdmin) {
                 return await i.followUp({

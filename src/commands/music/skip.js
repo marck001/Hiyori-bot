@@ -5,6 +5,7 @@ module.exports = {
     name: 'skip',
     description: 'skips one song to the next',
     devOnly: true,
+    inGuild:true,
     callback: async (client, interaction) => {
 
         try {
@@ -24,8 +25,7 @@ module.exports = {
             if (queue.playing) {
 
                 if(queue.songs.length<=0){
-               await     interaction.editReply("There's no next song");
-                    return;
+                    return await interaction.editReply("There's no next song") ;
                 }
        
                 await queue.skip();
