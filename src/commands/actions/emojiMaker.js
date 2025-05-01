@@ -82,14 +82,19 @@ module.exports = {
         try {
 
             if (!img && !gifOption && !urlString) return interaction.reply({ content: 'You must select a source format among image, url and user. Try again', ephemeral: true });
-            await interaction.deferReply({ ephemeral: false });
+
+            const embedColor = Math.floor(Math.random() * 16777214) + 1;
+            const waitEmbed = new EmbedBuilder()
+              .setColor(embedColor)
+              .setDescription(`Generating your **${gifOption}** gif...\n*This may take a few seconds...*`);
+            await interaction.reply({ embeds: [waitEmbed], ephemeral: false});
 
             if (urlString) {
                 const isValidUrl = urlString.match(/\.(jpeg|jpg|png|webp|gif|apng)$/i);
                 if (!isValidUrl) {
                     return interaction.editReply({
                         content: 'Invalid file URL. Please provide a valid image or GIF URL ending in .gif | .jpeg | .png like: \n ```https://example.com/mikugif.gif```',
-                        ephemeral: true
+                        ephemeral: true //! This will create a error, because you cannot set ephemeral on edit
                     });
                 }
             }
@@ -119,7 +124,7 @@ module.exports = {
 
             const attachment = new AttachmentBuilder(gifBuffer, { name: `output.gif` });
             const embed = new EmbedBuilder()
-                .setColor(Math.floor(Math.random() * 16777214) + 1)
+                .setColor(embedColor)
                 .setImage(`attachment://output.gif`)
                 .setDescription(`Your **${gifOption}** gif \n has been generated!`)
                 .setTimestamp();
