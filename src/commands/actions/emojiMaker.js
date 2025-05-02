@@ -82,6 +82,16 @@ module.exports = {
         try {
 
             if (!img && !gifOption && !urlString) return interaction.reply({ content: 'You must select a source format among image, url and user. Try again', ephemeral: true });
+            if (urlString) {
+              const isValidUrl = urlString.match(/\.(jpeg|jpg|png|webp|gif|apng)$/i);
+              if (!isValidUrl) {
+                return interaction.reply({
+                  content:
+                    "Invalid file URL. Please provide a valid image or GIF URL ending in .gif | .jpeg | .png like: \n ```https://example.com/mikugif.gif```",
+                  ephemeral: true,
+                });
+              }
+            }
 
             const embedColor = Math.floor(Math.random() * 16777214) + 1;
             const waitEmbed = new EmbedBuilder()
@@ -89,15 +99,6 @@ module.exports = {
               .setDescription(`Generating your **${gifOption}** gif...\n*This may take a few seconds...*`);
             await interaction.reply({ embeds: [waitEmbed], ephemeral: false});
 
-            if (urlString) {
-                const isValidUrl = urlString.match(/\.(jpeg|jpg|png|webp|gif|apng)$/i);
-                if (!isValidUrl) {
-                    return interaction.editReply({
-                        content: 'Invalid file URL. Please provide a valid image or GIF URL ending in .gif | .jpeg | .png like: \n ```https://example.com/mikugif.gif```',
-                        ephemeral: true //! This will create a error, because you cannot set ephemeral on edit
-                    });
-                }
-            }
             const options = [
                 { name: 'image', attachment: interaction.options.getAttachment('image') },
                 { name: 'url', value: urlString },
