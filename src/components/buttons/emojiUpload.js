@@ -8,7 +8,7 @@ const {
     TextInputStyle,
     PermissionFlagsBits
 } = require('discord.js');
-const messaEmbed = require('../embeds/messageEmbed')
+const messageEmbed = require('../embeds/messageEmbed')
 module.exports = async (interaction, embed, attachment, gifBuffer, time = 100 * 1000) => {
 
 
@@ -51,7 +51,8 @@ module.exports = async (interaction, embed, attachment, gifBuffer, time = 100 * 
                 filter: async (i) => {
                     if (i.user.id !== interaction.user.id) {
                         await i.reply({
-                            content: "You cannot interact with this button.",
+                            content: null,
+                            embeds:[messageEmbed("You cannot interact with this button.","info")],
                             ephemeral: true,
                         });
                         return false;
@@ -97,7 +98,8 @@ module.exports = async (interaction, embed, attachment, gifBuffer, time = 100 * 
 
                     if (!/^[a-zA-Z0-9_]+$/.test(emojiName)) {
                         return modalInteraction.reply({
-                            content: 'Invalid emoji name! Only letters, numbers, and underscores are allowed.',
+                            content: null,
+                            embeds:[messageEmbed('Invalid emoji name! Only letters, numbers, and underscores are allowed.',"error")],
                             ephemeral: true
                         });
                     }
@@ -109,13 +111,15 @@ module.exports = async (interaction, embed, attachment, gifBuffer, time = 100 * 
                         });
 
                         await modalInteraction.reply({
-                            content: `Successfully created emoji: ${createdEmoji}`,
+                            content: null,
+                            embeds:[messageEmbed(`Successfully created emoji: ${createdEmoji}`,"success")],
                             ephemeral: true
                         });
                     } catch (emojiError) {
                         console.error('Error creating emoji:', emojiError);
                         await modalInteraction.reply({
-                            content: 'Failed to create emoji. The file might be too large or the server has reached its emoji limit.',
+                            content: null,
+                            embeds:[messageEmbed('Failed to create emoji. The file might be too large or the server has reached its emoji limit.',"error")],
                             ephemeral: true
                         });
                     }
@@ -124,7 +128,8 @@ module.exports = async (interaction, embed, attachment, gifBuffer, time = 100 * 
                     console.error('Error in button interaction:', error);
                     if (!i.replied && !i.deferred) {
                         await i.reply({
-                            content: 'An error occurred while processing your request.',
+                            content: null,
+                            embeds:[messageEmbed('An error occurred while processing your request.',"error")],
                             ephemeral: true
                         }).catch(console.error);
                     }
@@ -138,12 +143,12 @@ module.exports = async (interaction, embed, attachment, gifBuffer, time = 100 * 
                     interaction.editReply({
                         components: []
                     }).catch(console.error);
-                    const messageEmbed = messaEmbed('The emoji upload button has expired.');
+                    const expEmbed = messageEmbed('The emoji upload button has expired.');
 
                     if (reason === 'time') {
                         interaction.followUp({
                             content: null,
-                            embeds: [messageEmbed],
+                            embeds: [expEmbed],
                             ephemeral: true
                         }).catch(console.error);
                     }
