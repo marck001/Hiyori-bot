@@ -3,7 +3,7 @@ const {
   EmbedBuilder, AttachmentBuilder
 
 } = require('discord.js');
-const { petpetMaker } = require('../../modules/actions/gifEncode');
+const { petpetMaker, generatePetGif } = require('../../modules/actions/gifEncode');
 
 module.exports = {
   deleted: false,
@@ -42,18 +42,12 @@ module.exports = {
 
       const avatarUrl = user.user.displayAvatarURL({ size: 2048, extension: 'png' });
 
-      const gifBuffer = await petpetMaker(avatarUrl, 10, 20, 200, true);
+      const gifBuffer = await  generatePetGif(avatarUrl,200, 10);
       let content;
-      if (interaction.user.id === userId) {
-
-        content = `**${interaction.user.displayName}** pats themselves`;
-      } else if (client.user.id === userId) {
-
-        content = `Aww, thank you so much (˶˃ ᵕ ˂˶) \n\n **${interaction.user.displayName}** *pats me*`;
-      } else {
-
-        content = `**${interaction.user.displayName}** gives **${user.displayName}** some pats `;
-      }
+      if (interaction.user.id === userId) content = `**${interaction.user.displayName}** pats themselves`;
+      else if (client.user.id === userId)  content = `Aww, thank you so much (˶˃ ᵕ ˂˶) \n\n **${interaction.user.displayName}** *pats me*`;
+      else content = `**${interaction.user.displayName}** gives **${user.displayName}** some pats `;
+      
 
       const attachment = new AttachmentBuilder(gifBuffer, { name: `pet${user.displayName}.gif` });
       const embed = new EmbedBuilder()
@@ -67,7 +61,7 @@ module.exports = {
 
       console.log(`There was an error: ${err}`);
       await interaction.editReply({
-        content: `Someone tell Mac, there's a problem with my system.`,
+        content: `Someone tell my creator, there's a problem with my system.`,
         ephemeral: true,
       });
 
