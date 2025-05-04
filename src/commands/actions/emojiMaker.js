@@ -6,6 +6,8 @@ const {
 const { petpetMaker, SoCuteMaker } = require('../../modules/actions/gifEncode');
 const { resolveImage } = require('../../functions/blob/resolveGifImage')
 const emojiUpload = require('../../components/buttons/emojiUpload')
+const {  InvalidURLError, ImageProcessingError, FileReadError } = require('../../modules/exceptions/Exceptions');
+const messageEmbed = require('../../components/embeds/messageEmbed');
 module.exports = {
     deleted: false,
     name: 'make-emoji',
@@ -83,7 +85,7 @@ module.exports = {
 
             if (!img && !gifOption && !urlString) return interaction.reply({ content: 'You must select a source format among image, url and user. Try again', ephemeral: true });
             if (urlString) {
-              const isValidUrl = urlString.match(/\.(jpeg|jpg|png|webp|gif|apng)$/i);
+              const isValidUrl = /^https:\/\/.+\.(jpeg|jpg|png|webp|gif|apng)$/i.test(urlString);
               if (!isValidUrl) {
                 return interaction.reply({
                   content:
@@ -96,7 +98,7 @@ module.exports = {
             const embedColor = Math.floor(Math.random() * 16777214) + 1;
             const waitEmbed = new EmbedBuilder()
               .setColor(embedColor)
-              .setDescription(`Generating your **${gifOption}** gif...\n*This may take a few seconds...*`);
+              .setDescription(`Generating your **${gifOption}** gif...\n*This may take a few seconds...* <a:loading:1367922538998661243>`);
             await interaction.reply({ embeds: [waitEmbed], ephemeral: false});
 
             const options = [
@@ -105,9 +107,7 @@ module.exports = {
                 { name: 'user', value: interaction.options.getUser('user')?.id, noServerAvatar },
             ];
 
-            const imageUrl = await resolveImage(options, interaction, isbgRemoved);
-
-
+            const imageUrl = await resolveImage(options, interaction);
             let gifBuffer;
 
             switch (gifOption) {
@@ -121,21 +121,27 @@ module.exports = {
                     throw 'Invalid GIF option selected';
             }
 
-
-
             const attachment = new AttachmentBuilder(gifBuffer, { name: `output.gif` });
             const embed = new EmbedBuilder()
                 .setColor(embedColor)
                 .setImage(`attachment://output.gif`)
                 .setDescription(`Your **${gifOption}** gif \n has been generated!`)
                 .setTimestamp();
-
-            
                 await  emojiUpload(interaction,embed,attachment,gifBuffer)
-        } catch (err) {
-
+        } catch (err) { 
             console.log(`There was an error in emoji maker: ${err}`);
-            await interaction.editReply({ content: 'You must select a source format either image, url or user. Try again', ephemeral: true });
+            let errorMessage = "An error occurred while processing your request.";
+            if (err instanceof InvalidURLError) {
+                errorMessage = `The provided URL is invalid `;
+            } else if (err instanceof ImageProcessingError) {
+                errorMessage = `Failed to process the image`;
+            } else if (err instanceof FileReadError) {
+                errorMessage = "Failed to read the file data. Please try again with a different file.";
+            }
+        
+            await interaction.editReply({
+                embeds: [messageEmbed(errorMessage,"error")] ,
+            });
 
         }
 
