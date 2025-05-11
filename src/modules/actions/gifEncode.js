@@ -455,4 +455,78 @@ async function explosionMaker(imageUrl, FRAMES, delay = DEFAULT_DELAY, resolutio
     }
 }
 
-module.exports = { petpetMaker, SoCuteMaker, hyperSoCuteMaker, generatePetGif, explosionMaker, generateSoCute };
+async function eatingCookieMaker(imageUrl, FRAMES, delay = DEFAULT_DELAY, resolution = DEFAULT_RESOLUTION, rounded = IS_ROUNDED) {
+
+    try {
+        const frames = await loadFrames(`https://raw.githubusercontent.com/marck001/gifs-utils/master/src/img/frames/cookies/frame`, 40);
+
+        const avatar = await loadImage(imageUrl)
+            .catch(error => {
+                if (error.code === 'ERR_INVALID_URL') {
+                    throw new InvalidURLError(imageUrl);
+                }
+                throw new ImageProcessingError(`Failed to load image: ${error.message}`);
+            });
+
+        const canvas = createCanvas(resolution, resolution);
+        const ctx = canvas.getContext('2d');
+
+        const gif = GIFEncoder();
+
+        for (let i = 0; i < FRAMES; i++) {
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (rounded) {
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(
+                    resolution / 2,
+                    resolution / 2,
+                    resolution / 2,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.closePath();
+                ctx.clip();
+            }
+
+            ctx.drawImage(
+                avatar,
+                0,
+                0,
+                resolution,
+                resolution
+            );
+            
+            if (rounded) ctx.restore();
+
+            ctx.drawImage(frames[i], -5, -8.5, resolution + 15, resolution + 15);
+
+            const imageData = ctx.getImageData(0, 0, resolution, resolution);
+            const palette = quantize(imageData.data, 256, { transparent: true });
+            const index = applyPalette(imageData.data, palette);
+
+            gif.writeFrame(index, resolution, resolution, {
+                transparent: true,
+                palette,
+                delay,
+            });
+        }
+        
+        gif.finish();
+        
+        const gifBuffer = Buffer.from(gif.bytesView());
+
+        return gifBuffer;
+    } catch (error) {
+        if (error.message.includes('Symbol.asyncIterator')) {
+            throw new FileReadError("Failed to process file - invalid file data");
+        } else {
+            throw new ImageProcessingError(`Error generating GIF: ${error.message}`);
+        }
+    }
+}
+
+module.exports = { petpetMaker, SoCuteMaker, hyperSoCuteMaker, generatePetGif, explosionMaker, generateSoCute, eatingCookieMaker };
